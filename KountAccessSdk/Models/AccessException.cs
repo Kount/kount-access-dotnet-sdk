@@ -17,12 +17,12 @@
 
     public class AccessException : Exception
     {
-        public AccessErrorType Error { get; private set; }
+        public AccessErrorType ErrorType { get; private set; }
         public new string Message;
 
         public AccessException(AccessErrorType errorType, string message)
         {
-            Error = errorType;
+            ErrorType = errorType;
             Message = message;
         }
     }

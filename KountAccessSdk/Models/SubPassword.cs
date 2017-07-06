@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KountAccessSdk.Models
+﻿namespace KountAccessSdk.Models
 {
-    using Newtonsoft.Json;
-
     public class SubPassword
     {
         public int alh { get; set; }
@@ -19,5 +11,61 @@ namespace KountAccessSdk.Models
         public int ulh { get; set; }
         public int ulm { get; set; }
 
+        public override bool Equals(object obj)
+        {
+            SubPassword sp = obj as SubPassword;
+
+            if (sp != null)
+            {
+                if (sp.alh != alh)
+                {
+                    return false;
+                }
+
+                if (sp.alm != alm)
+                {
+                    return false;
+                }
+
+                if (sp.dlh != dlh)
+                {
+                    return false;
+                }
+
+                if (sp.dlm != dlm)
+                {
+                    return false;
+                }
+
+                if (sp.iplh != iplh)
+                {
+                    return false;
+                }
+
+                if (sp.iplm != iplm)
+                {
+                    return false;
+                }
+
+                if (sp.ulh != ulh)
+                {
+                    return false;
+                }
+
+                if (sp.ulm != ulm)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            int sum = alh + alm + dlh + dlm + iplh + iplm + ulh + ulm;
+            return sum.GetHashCode();
+        }
     }
 }

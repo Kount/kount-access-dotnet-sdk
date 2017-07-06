@@ -1,5 +1,6 @@
 ﻿namespace KountAccessSdk.Service
 {
+    using KountAccessSdk.Interfaces;
     using KountAccessSdk.Models;
     using Newtonsoft.Json;
     using System;
@@ -8,15 +9,19 @@
     using System.Security.Authentication;
     using System.Security.Cryptography;
     using System.Text;
+    using System.Threading.Tasks;
 
     public class AccessSdk
     {
+        private const string DEAFULT_VERSION = "0210";
+
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
         private readonly string _host;
         private readonly int _merchantId;
 
         private readonly string _version;
+        private IWebClientFactory webClientFactory;
 
         /// <summary>
         /// Creates instance of the AccessSdk, allowing the client to specify version of responses to request.
@@ -25,8 +30,18 @@
         /// <param name="merchantId">merchantId Merchant ID (6 digit value).</param>
         /// <param name="apiKey">apiKey The API Key for the merchant.</param>
         /// <param name="version">version The version of the API response to return.</param>
-        public AccessSdk(string host, int merchantId, string apiKey, string version = "0210")
+        /// <param name="webClientFactory">used for webClient mockup in tests.</param>
+        public AccessSdk(string host, int merchantId, string apiKey, string version = DEAFULT_VERSION, IWebClientFactory webClientFactory = null)
         {
+            if (webClientFactory == null)
+            {
+                this.webClientFactory = new SystemWebClientFactory();
+            }
+            else
+            {
+                this.webClientFactory = webClientFactory;
+            }
+
             if (apiKey == null)
             {
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Missing apiKey");
@@ -64,8 +79,17 @@
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
             }
 
-            using (WebClient client = new WebClient())
+            using (IWebClient client = this.webClientFactory.Create())
             {
+                WebClient wclient = (WebClient)client;
+
+                wclient.Headers["Authorization"] = "Basic " + this._encodedCredentials;
+                wclient.Headers["Content-Type"] = "text/json";
+                wclient.Headers["Accept"] = "text/json";
+
+                wclient.BaseAddress = this._host;
+                wclient.Encoding = System.Text.Encoding.UTF8;
+
                 NameValueCollection reqparm = new NameValueCollection();
 
                 reqparm.Add("s", sessionId);
@@ -89,13 +113,6 @@
                     reqparm.Add("ah", ah);
                 }
 
-                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                client.Headers["Content-Type"] = "text/json";
-                client.Headers["Accept"] = "text/json";
-
-                client.BaseAddress = this._host;
-                client.Encoding = System.Text.Encoding.UTF8;
-
                 try
                 {
                     byte[] responsebytes = client.UploadValues("/api/decision", "POST", reqparm);
@@ -103,6 +120,66 @@
                     DecisionInfo dInfo = JsonConvert.DeserializeObject<DecisionInfo>(responsebody);
 
                     return dInfo;
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Decision data async for the session's username and password.
+        /// </summary>
+        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="username">The username of the user.</param>
+        /// <param name="password">The password of the user.</param>
+        /// <returns>Decision data</returns>
+        public async Task<DecisionInfo> GetDecisionAsync(string sessionId, string username, string password)
+        {
+            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
+            }
+
+            using (WebClient client = new WebClient())
+            {
+                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
+                client.Headers["Content-Type"] = "text/json";
+                client.Headers["Accept"] = "text/json";
+
+                client.BaseAddress = this._host;
+                client.Encoding = System.Text.Encoding.UTF8;
+
+                NameValueCollection reqparm = new NameValueCollection();
+
+                reqparm.Add("s", sessionId);
+                reqparm.Add("v", this._version);
+
+                if (!String.IsNullOrEmpty(username))
+                {
+                    string uh = HashValue(username);
+                    reqparm.Add("uh", uh);
+                }
+
+                if (!String.IsNullOrEmpty(password))
+                {
+                    string ph = HashValue(password);
+                    reqparm.Add("ph", ph);
+                }
+
+                if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
+                {
+                    string ah = HashValue($"{username}:{password}");
+                    reqparm.Add("ah", ah);
+                }
+
+                try
+                {
+                    byte[] responsebytes = await client.UploadValuesTaskAsync("/api/decision", "POST", reqparm);
+                    string responsebody = Encoding.UTF8.GetString(responsebytes);
+                    return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<DecisionInfo>(responsebody));
                 }
                 catch (WebException ex)
                 {
@@ -124,6 +201,45 @@
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
             }
 
+            using (IWebClient client = this.webClientFactory.Create())
+            {
+                WebClient wclient = (WebClient)client;
+
+                wclient.Headers["Authorization"] = "Basic " + this._encodedCredentials;
+                wclient.Headers["Content-Type"] = "text/json";
+                wclient.Headers["Accept"] = "text/json";
+
+                wclient.BaseAddress = this._host;
+                wclient.Encoding = System.Text.Encoding.UTF8;
+
+                try
+                {
+                    var endPoint = $"/api/device?s={sessionId}&v={this._version}";
+                    string res = client.DownloadString(endPoint);
+                    DeviceInfo dInfo = JsonConvert.DeserializeObject<DeviceInfo>(res);
+
+                    return dInfo;
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the device data async for the session.
+        /// </summary>
+        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <returns>Device data</returns>
+        public async Task<DeviceInfo> GetDeviceAsync(string sessionId)
+        {
+            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
+            }
+
             using (WebClient client = new WebClient())
             {
                 client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
@@ -136,10 +252,8 @@
                 try
                 {
                     var endPoint = $"/api/device?s={sessionId}&v={this._version}";
-                    string res = client.DownloadString(endPoint);
-                    DeviceInfo dInfo = JsonConvert.DeserializeObject<DeviceInfo>(res);
-
-                    return dInfo;
+                    var res = await client.DownloadStringTaskAsync(endPoint);
+                    return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<DeviceInfo>(res));
                 }
                 catch (WebException ex)
                 {
@@ -163,8 +277,17 @@
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
             }
 
-            using (WebClient client = new WebClient())
+            using (IWebClient client = this.webClientFactory.Create())
             {
+                WebClient wclient = (WebClient)client;
+
+                wclient.Headers["Authorization"] = "Basic " + this._encodedCredentials;
+                wclient.Headers["Content-Type"] = "text/json";
+                wclient.Headers["Accept"] = "text/json";
+
+                wclient.BaseAddress = this._host;
+                wclient.Encoding = System.Text.Encoding.UTF8;
+
                 NameValueCollection reqparm = new NameValueCollection();
 
                 reqparm.Add("s", sessionId);
@@ -188,13 +311,6 @@
                     reqparm.Add("ah", ah);
                 }
 
-                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                client.Headers["Content-Type"] = "text/json";
-                client.Headers["Accept"] = "text/json";
-
-                client.BaseAddress = this._host;
-                client.Encoding = System.Text.Encoding.UTF8;
-
                 try
                 {
                     byte[] responsebytes = client.UploadValues("/api/velocity", "POST", reqparm);
@@ -211,6 +327,67 @@
             }
         }
 
+
+        /// <summary>
+        /// Gets the velocity data async for the session's username and password.
+        /// </summary>
+        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="username">The username of the user.</param>
+        /// <param name="password">The password of the user.</param>
+        /// <returns>Velocity data</returns>
+        public async Task<VelocityInfo> GetVelocityAsync(string sessionId, string username, string password)
+        {
+            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
+            }
+
+            using (WebClient client = new WebClient())
+            {
+
+                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
+                client.Headers["Content-Type"] = "text/json";
+                client.Headers["Accept"] = "text/json";
+
+                client.BaseAddress = this._host;
+                client.Encoding = System.Text.Encoding.UTF8;
+
+                NameValueCollection reqparm = new NameValueCollection();
+
+                reqparm.Add("s", sessionId);
+                reqparm.Add("v", this._version);
+
+                if (!String.IsNullOrEmpty(username))
+                {
+                    string uh = HashValue(username);
+                    reqparm.Add("uh", uh);
+                }
+
+                if (!String.IsNullOrEmpty(password))
+                {
+                    string ph = HashValue(password);
+                    reqparm.Add("ph", ph);
+                }
+
+                if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
+                {
+                    string ah = HashValue($"{username}:{password}");
+                    reqparm.Add("ah", ah);
+                }
+
+                try
+                {
+                    byte[] responsebytes = await client.UploadValuesTaskAsync("/api/velocity", "POST", reqparm);
+                    string responsebody = Encoding.UTF8.GetString(responsebytes);
+                    return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<VelocityInfo>(responsebody));
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
 
         /// <summary>
         /// Converts the auth header.
@@ -280,6 +457,7 @@
                             break;
 
                         default:
+                            error_description = "UNKNOWN NETWORK ISSUE.";
                             break;
                     }
                 }
@@ -308,107 +486,6 @@
             return hex;
         }
 
-        /*********************** HELPS *****************************
-        /// <summary>
-        /// Get the help page for GetDecision.
-        /// </summary>
-        /// <returns>HTML String.</returns>
-        public string HelpGetDecision()
-        {
-            using (WebClient client = new WebClient())
-            {
-                NameValueCollection reqparm = new NameValueCollection();
-
-                reqparm.Add("v", this._version);
-                reqparm.Add("help", "");
-
-                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                client.Headers["Content-Type"] = "text/json";
-                client.Headers["Accept"] = "text/json";
-
-                client.BaseAddress = this._host;
-                client.Encoding = System.Text.Encoding.UTF8;
-
-                try
-                {
-                    byte[] responsebytes = client.UploadValues("/api/decision", "POST", reqparm);
-                    string responsebody = Encoding.UTF8.GetString(responsebytes);
-
-                    return responsebody;
-                }
-                catch (WebException ex)
-                {
-                    HandleWebException(ex);
-                }
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Get the help page for GetDevice.
-        /// </summary>
-        /// <returns>HTML String.</returns>
-        public string HelpGetDevice()
-        {
-            using (WebClient client = new WebClient())
-            {
-                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                client.Headers["Content-Type"] = "text/json";
-                client.Headers["Accept"] = "text/json";
-
-                client.BaseAddress = this._host;
-                client.Encoding = System.Text.Encoding.UTF8;
-
-                try
-                {
-                    var endPoint = $"/api/device?v={this._version}&help=";
-                    string res = client.DownloadString(endPoint);
-
-                    return res;
-                }
-                catch (WebException ex)
-                {
-                    HandleWebException(ex);
-                }
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Get the help page for GetVelocity.
-        /// </summary>
-        /// <returns>HTML String.</returns>
-        public string HelpGetVelocity()
-        {
-            using (WebClient client = new WebClient())
-            {
-                NameValueCollection reqparm = new NameValueCollection();
-
-                reqparm.Add("v", this._version);
-                reqparm.Add("help", "");
-
-                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                client.Headers["Content-Type"] = "text/json";
-                client.Headers["Accept"] = "text/json";
-
-                client.BaseAddress = this._host;
-                client.Encoding = System.Text.Encoding.UTF8;
-
-                try
-                {
-                    byte[] responsebytes = client.UploadValues("/api/velocity", "POST", reqparm);
-                    string responsebody = Encoding.UTF8.GetString(responsebytes);
-
-                    return responsebody;
-                }
-                catch (WebException ex)
-                {
-                    HandleWebException(ex);
-                }
-                return null;
-            }
-        }
-********************************************************/
 
     }
 }

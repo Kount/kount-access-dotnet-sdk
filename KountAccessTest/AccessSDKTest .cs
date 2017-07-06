@@ -4,11 +4,13 @@
     using KountAccessSdk.Service;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
+    using System;
     using System.Collections.Generic;
 
     [TestClass]
     public class AccessSDKTest
     {
+        private const string DEAFULT_VERSION = "0210"; 
         // Setup data for comparisons.
         private static int merchantId = 999999;
 
@@ -33,31 +35,11 @@
         private string jsonVeloInfo;
         private string jsonDeciInfo;
 
-        [TestMethod]
-        public void TestConstructorAccessSDKHappyPath()
-        {
-            // Create the SDK.  If any of these values are invalid, an
-            // AccessException will be thrown along with a
-            // message detailing why.
-            try
-            {
-                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey);
-
-                Assert.IsNotNull(sdk);
-
-            }
-            catch (AccessException ae)
-            {
-
-                Assert.Fail($"Bad exception {ae.Error}:{ae.Message}");
-            }
-        }
-
         [TestInitialize]
         public void TestSdkInit()
         {
             deviceInfo = new DeviceInfo();
-            deviceInfo.Device = new Device { Country = ipGeo, Region = "ID", GeoLat = 43.37, GeoLong = -116.200, Id = fingerprint, IpAddress = ipAddress, IpGeo = ipGeo, Mobile = 0, Proxy = 0 };
+            deviceInfo.Device = new Device { Country = ipGeo, Region = "ID", GeoLat = 43.37, GeoLong = -116.200, Id = fingerprint, IpAddress = ipAddress, IpGeo = ipGeo, Mobile = 1, Proxy = 0 };
             deviceInfo.ResponceId = responseId;
             jsonDevInfo = JsonConvert.SerializeObject(deviceInfo);
 
@@ -80,14 +62,229 @@
             {
                 Errors = new List<string> { "E1", "E2" },
                 Warnings = new List<string> { "W1", "W2" },
-                Reply = new Reply {
-                    RuleEvents = new RuleEvents {
+                Reply = new Reply
+                {
+                    RuleEvents = new RuleEvents
+                    {
                         Decision = decision,
                         Total = 10,
-                        Events = new List<string> { "Event 1", "Event 2" } } }
+                        Events = new List<string> { "Event 1", "Event 2" }
+                    }
+                }
             };
 
             jsonDeciInfo = JsonConvert.SerializeObject(decisionInfo);
         }
+
+        [TestMethod]
+        public void TestConstructorAccessSDKHappyPath()
+        {
+            // Create the SDK.  If any of these values are invalid, an
+            // AccessException will be thrown along with a
+            // message detailing why.
+            try
+            {
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey);
+
+                Assert.IsNotNull(sdk);
+
+            }
+            catch (AccessException ae)
+            {
+
+                Assert.Fail($"Bad exception {ae.ErrorType}:{ae.Message}");
+            }
+        }
+
+        [TestMethod]
+        public void TestConstructorAccessSDKMissingApiKey()
+        {
+            try
+            {
+                AccessSdk sdk = new AccessSdk(host, merchantId, null);
+                Assert.Fail("Should have failed apiKey");
+
+            }
+            catch (AccessException ae)
+            {
+                Assert.AreEqual(AccessErrorType.INVALID_DATA, ae.ErrorType);
+            }
+        }
+
+        [TestMethod]
+        public void TestConstructorAccessSDKMissingHost()
+        {
+            try
+            {
+    
+                AccessSdk sdk = new AccessSdk(null, merchantId, apiKey);
+                Assert.Fail("Should have failed host");
+
+            }
+            catch (AccessException ae)
+            {
+                Assert.AreEqual(AccessErrorType.INVALID_DATA, ae.ErrorType);
+            }
+        }
+
+        [TestMethod]
+        public void TestConstructorAccessSDKBadMerchant()
+        {
+            try
+            {
+    
+                AccessSdk sdk = new AccessSdk(host, -1, apiKey);
+                Assert.Fail("Should have failed merchantId");
+
+            }
+            catch (AccessException ae)
+            {
+                Assert.AreEqual(AccessErrorType.INVALID_DATA, ae.ErrorType);
+            }
+        }
+
+        [TestMethod]
+        public void TestConstructorAccessSDKBlankApiKey()
+        {
+            try
+            {
+   
+                AccessSdk sdk = new AccessSdk(host, merchantId, "    ");
+                Assert.Fail("Should have failed apiKey");
+
+            }
+            catch (AccessException ae)
+            {
+                Assert.AreEqual(AccessErrorType.INVALID_DATA, ae.ErrorType);
+            }
+        }
+
+        [TestMethod]
+        public void TestGetDevice()
+        {
+            try
+            {
+                MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDevInfo);
+
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+
+                DeviceInfo dInfo = sdk.GetDevice(session);
+                Assert.IsNotNull(dInfo);
+                Assert.AreEqual(fingerprint, dInfo.Device.Id);
+                Assert.AreEqual(ipAddress, dInfo.Device.IpAddress);
+                Assert.AreEqual(ipGeo, dInfo.Device.IpGeo);
+                Assert.AreEqual(1, dInfo.Device.Mobile);
+                Assert.AreEqual(0, dInfo.Device.Proxy);
+                Assert.AreEqual(responseId, dInfo.ResponceId);
+
+            }
+            catch (AccessException ae)
+            {
+
+                Assert.Fail($"Bad exception {ae.ErrorType}:{ae.Message}");
+            }
+
+        }
+
+        [TestMethod]
+        public void TestGetDeviceConnectionClosed()
+        {
+            try
+            {
+                MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDevInfo);
+
+                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+
+                DeviceInfo dInfo = sdk.GetDevice(session);
+
+                Assert.Fail($"AccessException Not thrown");
+
+            }
+            catch (AccessException ae)
+            {
+                Console.WriteLine(ae.Message);
+                Assert.AreEqual(ae.ErrorType, AccessErrorType.NETWORK_ERROR);
+            }
+
+        }
+
+
+        [TestMethod]
+        public void TestGetVelocity()
+        {
+            try
+            {
+                MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonVeloInfo);
+
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+
+                VelocityInfo vInfo = sdk.GetVelocity(session, user, password);
+
+                Assert.IsNotNull(vInfo);
+
+                Assert.IsTrue(velocityInfo.Velocity.Password.Equals(vInfo.Velocity.Password));
+                Assert.AreEqual(vInfo.ResponceId, responseId);
+
+
+            }
+            catch (AccessException ae)
+            {
+
+                Assert.Fail($"Bad exception {ae.ErrorType}:{ae.Message}");
+            }
+
+        }
+
+        [TestMethod]
+        public void TestGetVelocityWebExceptionWithResponse()
+        {
+            try
+            {
+                MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonVeloInfo);
+
+                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+
+                VelocityInfo vInfo = sdk.GetVelocity(session, user, password);
+
+                Assert.Fail($"AccessException Not thrown");
+
+
+            }
+            catch (AccessException ae)
+            {
+
+                Assert.AreEqual(ae.ErrorType, AccessErrorType.NETWORK_ERROR);
+                Assert.IsTrue("BAD RESPONSE(OK):OK. UNKNOWN NETWORK ISSUE.".Equals(ae.Message.Trim()));
+            }
+
+        }
+
+        [TestMethod]
+        public void TestGetDecision()
+        {
+            try
+            {
+                MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDeciInfo);
+
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+
+                DecisionInfo deInfo = sdk.GetDecision(session, user, password);
+
+                Assert.IsNotNull(deInfo);
+
+                Assert.AreEqual(decision, deInfo.Decision.Reply.RuleEvents.Decision);
+
+                Assert.AreEqual(deviceInfo.Device.Id, deInfo.Device.Id);
+                Assert.IsTrue(velocityInfo.Velocity.Password.Equals(deInfo.Velocity.Password));
+            }
+            catch (AccessException ae)
+            {
+
+                Assert.Fail($"Bad exception {ae.ErrorType}:{ae.Message}");
+            }
+
+        }
+
+
     }
 }
