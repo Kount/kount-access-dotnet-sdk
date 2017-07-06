@@ -1,5 +1,13 @@
-﻿namespace KountAccessSdk.Models
+﻿//-----------------------------------------------------------------------
+// <copyright file="SubPassword.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace KountAccessSdk.Models
 {
+    /// <summary>
+    /// Class definition of SubPassword
+    /// </summary>
     public class SubPassword
     {
         public int alh { get; set; }

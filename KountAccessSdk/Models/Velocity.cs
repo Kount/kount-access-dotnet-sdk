@@ -1,7 +1,15 @@
-﻿namespace KountAccessSdk.Models
+﻿//-----------------------------------------------------------------------
+// <copyright file="Velocity.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace KountAccessSdk.Models
 {
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Class definition of Velocity
+    /// </summary>
     public class Velocity
     {
         [JsonProperty("account")]

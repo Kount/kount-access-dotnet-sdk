@@ -1,7 +1,15 @@
-﻿namespace KountAccessSdk.Models
+﻿//-----------------------------------------------------------------------
+// <copyright file="DecisionInfo.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace KountAccessSdk.Models
 {
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Class definition of DecisionInfo
+    /// </summary>
     public class DecisionInfo
     {
         [JsonProperty("decision")]

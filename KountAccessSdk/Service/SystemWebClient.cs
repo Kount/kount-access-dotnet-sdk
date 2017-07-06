@@ -1,4 +1,9 @@
-﻿namespace KountAccessSdk.Service
+﻿//-----------------------------------------------------------------------
+// <copyright file="SystemWebClient.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace KountAccessSdk.Service
 {
     using KountAccessSdk.Interfaces;
     using System.Net;

@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿//-----------------------------------------------------------------------
+// <copyright file="SubUser.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 namespace KountAccessSdk.Models
 {
+    /// <summary>
+    /// Class definition of SubUser
+    /// </summary>
     public class SubUser
     {
         public int alh { get; set; }
@@ -16,6 +18,5 @@ namespace KountAccessSdk.Models
         public int iplm { get; set; }
         public int plh { get; set; }
         public int plm { get; set; }
-
     }
 }

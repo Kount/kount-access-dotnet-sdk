@@ -1,13 +1,19 @@
-﻿using KountAccessSdk.Interfaces;
-using System;
-using System.Collections.Specialized;
-using System.Net;
-using System.Text;
+﻿//-----------------------------------------------------------------------
+// <copyright file="MockupWebClient.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace KountAccessTest
 {
+    using KountAccessSdk.Interfaces;
+    using System;
+    using System.Collections.Specialized;
+    using System.Net;
+    using System.Text;
+
     /// <summary>
-    /// System web client.
+    /// Mockup system web client.
     /// </summary>
     public class MockupWebClient : WebClient, IWebClient
     {
@@ -42,7 +48,7 @@ namespace KountAccessTest
     }
 
     /// <summary>
-    /// System web client factory.
+    /// Mockup web client factory.
     /// </summary>
     public class MockupWebClientFactory : IWebClientFactory
     {

@@ -1,4 +1,9 @@
-﻿namespace KountAccessTest
+﻿//-----------------------------------------------------------------------
+// <copyright file="AccessSDKTest.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace KountAccessTest
 {
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
@@ -7,6 +12,9 @@
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Test class for AccessSDK
+    /// </summary>
     [TestClass]
     public class AccessSDKTest
     {

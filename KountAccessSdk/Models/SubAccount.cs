@@ -1,5 +1,13 @@
-﻿namespace KountAccessSdk.Models
+﻿//-----------------------------------------------------------------------
+// <copyright file="SubAccount.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace KountAccessSdk.Models
 {
+    /// <summary>
+    /// Class definition of SubAccount
+    /// </summary>
     public class SubAccount
     {
         public int dlh { get; set; }

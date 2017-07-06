@@ -1,7 +1,15 @@
-﻿namespace KountAccessSdk.Models
+﻿//-----------------------------------------------------------------------
+// <copyright file="Device.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace KountAccessSdk.Models
 {
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Class definition of Device model
+    /// </summary>
     public class Device
     {
         [JsonProperty("id")]

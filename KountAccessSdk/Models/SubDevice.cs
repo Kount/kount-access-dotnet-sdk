@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿//-----------------------------------------------------------------------
+// <copyright file="SubDevice.cs" company="Kount Inc">
+//     Copyright 2017 Kount Inc. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 namespace KountAccessSdk.Models
 {
-    using Newtonsoft.Json;
-
+    /// <summary>
+    /// Class definition of SubDevice
+    /// </summary>
     public class SubDevice
     {
         public int alh { get; set; }
@@ -18,6 +18,5 @@ namespace KountAccessSdk.Models
         public int plm { get; set; }
         public int ulh { get; set; }
         public int ulm { get; set; }
-
     }
 }
