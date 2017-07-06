@@ -268,14 +268,14 @@
 
                 AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
 
-                DecisionInfo deInfo = sdk.GetDecision(session, user, password);
+                DecisionInfo decisionInfo = sdk.GetDecision(session, user, password);
 
-                Assert.IsNotNull(deInfo);
+                Assert.IsNotNull(decisionInfo);
 
-                Assert.AreEqual(decision, deInfo.Decision.Reply.RuleEvents.Decision);
+                Assert.AreEqual(decision, decisionInfo.Decision.Reply.RuleEvents.Decision);
 
-                Assert.AreEqual(deviceInfo.Device.Id, deInfo.Device.Id);
-                Assert.IsTrue(velocityInfo.Velocity.Password.Equals(deInfo.Velocity.Password));
+                Assert.AreEqual(deviceInfo.Device.Id, decisionInfo.Device.Id);
+                Assert.IsTrue(velocityInfo.Velocity.Password.Equals(decisionInfo.Velocity.Password));
             }
             catch (AccessException ae)
             {
