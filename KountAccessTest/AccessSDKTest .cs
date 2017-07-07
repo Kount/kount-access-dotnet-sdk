@@ -53,7 +53,7 @@ namespace KountAccessTest
 
             velocityInfo = new VelocityInfo();
             velocityInfo.Device = deviceInfo.Device;
-            velocityInfo.ResponceId = responseId;
+            velocityInfo.ResponseId = responseId;
             velocityInfo.Velocity = new Velocity();
             velocityInfo.Velocity.Account = new SubAccount { dlh = 1, dlm = 1, iplh = 1, iplm = 1, plh = 1, plm = 1, ulh = 1, ulm = 1 };
             velocityInfo.Velocity.Device = new SubDevice { alh = 1, alm = 1, iplh = 3, iplm = 3, plh = 2, plm = 2, ulh = 1, ulm = 1 };
@@ -231,7 +231,7 @@ namespace KountAccessTest
                 Assert.IsNotNull(vInfo);
 
                 Assert.IsTrue(velocityInfo.Velocity.Password.Equals(vInfo.Velocity.Password));
-                Assert.AreEqual(vInfo.ResponceId, responseId);
+                Assert.AreEqual(vInfo.ResponseId, responseId);
 
 
             }
