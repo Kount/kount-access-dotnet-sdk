@@ -10,13 +10,13 @@ Required:
 * Kount Access service host
 
 Create an SDK object:
-```c#
+```cs
   AccessSdk sdk = new AccessSdk(accessHost, merchantId, apiKey);
 ```
 
 Retrieve device information collected by the Data Collector:
 
-```c#
+```cs
   // sessionId, 32-character identifier, applied for customer session, provided to data collector
   DeviceInfo deviceInformation = sdk.GetDevice(sessionId);
 
@@ -28,7 +28,7 @@ Retrieve device information collected by the Data Collector:
 ```
 
 Get velocity for one of our customers:
-```c#
+```cs
   // for greater security, username and password are internally hashed before transmitting the request
   // you can hash them yourself, this wouldn't affect the Kount Access Service
   VelocityInfo accessInfo = sdk.GetVelocity(sessionId, username, password);
@@ -47,7 +47,7 @@ Get velocity for one of our customers:
 
 And last, the `decision` endpoint usage:
 
-```c#
+```cs
   DecisionInfo decisionInfo = sdk.GetDecision(sessionId, username, password); // those again are hashed internally
   Decision decision = this.decisionInfo.Decision;
   Console.WriteLine("errors: " + decision.Errors.Count);
