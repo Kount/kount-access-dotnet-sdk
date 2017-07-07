@@ -86,37 +86,10 @@ namespace KountAccessSdk.Service
 
             using (IWebClient client = this.webClientFactory.Create())
             {
-                WebClient wclient = (WebClient)client;
 
-                wclient.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                wclient.Headers["Content-Type"] = "text/json";
-                wclient.Headers["Accept"] = "text/json";
+                PrepareWebClient((WebClient)client);
 
-                wclient.BaseAddress = this._host;
-                wclient.Encoding = System.Text.Encoding.UTF8;
-
-                NameValueCollection reqparm = new NameValueCollection();
-
-                reqparm.Add("s", sessionId);
-                reqparm.Add("v", this._version);
-
-                if (!String.IsNullOrEmpty(username))
-                {
-                    string uh = HashValue(username);
-                    reqparm.Add("uh", uh);
-                }
-
-                if (!String.IsNullOrEmpty(password))
-                {
-                    string ph = HashValue(password);
-                    reqparm.Add("ph", ph);
-                }
-
-                if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
-                {
-                    string ah = HashValue($"{username}:{password}");
-                    reqparm.Add("ah", ah);
-                }
+                NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
 
                 try
                 {
@@ -150,35 +123,9 @@ namespace KountAccessSdk.Service
 
             using (WebClient client = new WebClient())
             {
-                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                client.Headers["Content-Type"] = "text/json";
-                client.Headers["Accept"] = "text/json";
+                PrepareWebClient(client);
 
-                client.BaseAddress = this._host;
-                client.Encoding = System.Text.Encoding.UTF8;
-
-                NameValueCollection reqparm = new NameValueCollection();
-
-                reqparm.Add("s", sessionId);
-                reqparm.Add("v", this._version);
-
-                if (!String.IsNullOrEmpty(username))
-                {
-                    string uh = HashValue(username);
-                    reqparm.Add("uh", uh);
-                }
-
-                if (!String.IsNullOrEmpty(password))
-                {
-                    string ph = HashValue(password);
-                    reqparm.Add("ph", ph);
-                }
-
-                if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
-                {
-                    string ah = HashValue($"{username}:{password}");
-                    reqparm.Add("ah", ah);
-                }
+                NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
 
                 try
                 {
@@ -194,6 +141,8 @@ namespace KountAccessSdk.Service
             }
         }
 
+
+
         /// <summary>
         /// Gets the device data for the session.
         /// </summary>
@@ -208,14 +157,7 @@ namespace KountAccessSdk.Service
 
             using (IWebClient client = this.webClientFactory.Create())
             {
-                WebClient wclient = (WebClient)client;
-
-                wclient.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                wclient.Headers["Content-Type"] = "text/json";
-                wclient.Headers["Accept"] = "text/json";
-
-                wclient.BaseAddress = this._host;
-                wclient.Encoding = System.Text.Encoding.UTF8;
+                PrepareWebClient((WebClient)client);
 
                 try
                 {
@@ -233,6 +175,7 @@ namespace KountAccessSdk.Service
             }
         }
 
+
         /// <summary>
         /// Gets the device data async for the session.
         /// </summary>
@@ -247,12 +190,7 @@ namespace KountAccessSdk.Service
 
             using (WebClient client = new WebClient())
             {
-                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                client.Headers["Content-Type"] = "text/json";
-                client.Headers["Accept"] = "text/json";
-
-                client.BaseAddress = this._host;
-                client.Encoding = System.Text.Encoding.UTF8;
+                PrepareWebClient(client);
 
                 try
                 {
@@ -284,37 +222,9 @@ namespace KountAccessSdk.Service
 
             using (IWebClient client = this.webClientFactory.Create())
             {
-                WebClient wclient = (WebClient)client;
+                PrepareWebClient((WebClient)client);
 
-                wclient.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                wclient.Headers["Content-Type"] = "text/json";
-                wclient.Headers["Accept"] = "text/json";
-
-                wclient.BaseAddress = this._host;
-                wclient.Encoding = System.Text.Encoding.UTF8;
-
-                NameValueCollection reqparm = new NameValueCollection();
-
-                reqparm.Add("s", sessionId);
-                reqparm.Add("v", this._version);
-
-                if (!String.IsNullOrEmpty(username))
-                {
-                    string uh = HashValue(username);
-                    reqparm.Add("uh", uh);
-                }
-
-                if (!String.IsNullOrEmpty(password))
-                {
-                    string ph = HashValue(password);
-                    reqparm.Add("ph", ph);
-                }
-
-                if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
-                {
-                    string ah = HashValue($"{username}:{password}");
-                    reqparm.Add("ah", ah);
-                }
+                NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
 
                 try
                 {
@@ -350,35 +260,9 @@ namespace KountAccessSdk.Service
             using (WebClient client = new WebClient())
             {
 
-                client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-                client.Headers["Content-Type"] = "text/json";
-                client.Headers["Accept"] = "text/json";
+                PrepareWebClient(client);
 
-                client.BaseAddress = this._host;
-                client.Encoding = System.Text.Encoding.UTF8;
-
-                NameValueCollection reqparm = new NameValueCollection();
-
-                reqparm.Add("s", sessionId);
-                reqparm.Add("v", this._version);
-
-                if (!String.IsNullOrEmpty(username))
-                {
-                    string uh = HashValue(username);
-                    reqparm.Add("uh", uh);
-                }
-
-                if (!String.IsNullOrEmpty(password))
-                {
-                    string ph = HashValue(password);
-                    reqparm.Add("ph", ph);
-                }
-
-                if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
-                {
-                    string ah = HashValue($"{username}:{password}");
-                    reqparm.Add("ah", ah);
-                }
+                NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
 
                 try
                 {
@@ -392,6 +276,45 @@ namespace KountAccessSdk.Service
                 }
                 return null;
             }
+        }
+
+        private void PrepareWebClient(WebClient client)
+        {
+            client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
+            client.Headers["Content-Type"] = "text/json";
+            client.Headers["Accept"] = "text/json";
+
+            client.BaseAddress = this._host;
+            client.Encoding = System.Text.Encoding.UTF8;
+
+        }
+
+        private NameValueCollection GetRequestedParams(string sessionId, string username, string password)
+        {
+            NameValueCollection reqparm = new NameValueCollection();
+
+            reqparm.Add("s", sessionId);
+            reqparm.Add("v", this._version);
+
+            if (!String.IsNullOrEmpty(username))
+            {
+                string uh = HashValue(username);
+                reqparm.Add("uh", uh);
+            }
+
+            if (!String.IsNullOrEmpty(password))
+            {
+                string ph = HashValue(password);
+                reqparm.Add("ph", ph);
+            }
+
+            if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
+            {
+                string ah = HashValue($"{username}:{password}");
+                reqparm.Add("ah", ah);
+            }
+
+            return reqparm;
         }
 
         /// <summary>
