@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KountAccessSdk", "KountAccessSdk\KountAccessSdk.csproj", "{D29A348E-F29B-49BA-A19D-DC1BF1766F63}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KountAccessTest", "KountAccessTest\KountAccessTest.csproj", "{822F9342-FA7F-4A7E-9A9E-80EEDAA2E564}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KountAccessExample", "KountAccessExample\KountAccessExample.csproj", "{99C8E114-275B-4D44-967A-07E555195D3F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{822F9342-FA7F-4A7E-9A9E-80EEDAA2E564}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{822F9342-FA7F-4A7E-9A9E-80EEDAA2E564}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{822F9342-FA7F-4A7E-9A9E-80EEDAA2E564}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99C8E114-275B-4D44-967A-07E555195D3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C8E114-275B-4D44-967A-07E555195D3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99C8E114-275B-4D44-967A-07E555195D3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99C8E114-275B-4D44-967A-07E555195D3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
