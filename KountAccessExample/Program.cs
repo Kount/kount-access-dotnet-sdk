@@ -122,7 +122,7 @@ namespace KountAccessExample
             }
         }
 
-        public void PrintDeviceInfo(Device device)
+        private void PrintDeviceInfo(Device device)
         {
             // Fingerprint
             Console.WriteLine("Got Fingerprint:" + device.Id);
@@ -143,7 +143,7 @@ namespace KountAccessExample
         /// Example method to walk through the velocity data.
         /// </summary>
         /// <param name="velocity">Velocity type</param>
-        public void PrintVelocityInfo(Velocity velocity)
+        private void PrintVelocityInfo(Velocity velocity)
         {
             Console.WriteLine("Got Account data: ");
             this.PrintFields(velocity.Account);
@@ -158,13 +158,14 @@ namespace KountAccessExample
         }
 
         /// <summary>
-        ///
+        /// Example method to walk through the velocity data.
         /// </summary>
         /// <param name="decision"></param>
-        public void PrintDecisionInfo(Decision decision)
+        private void PrintDecisionInfo(Decision decision)
         {
             Console.WriteLine("Got errors: " + decision.Errors.Count);
-            Console.WriteLine("Got reply: " + decision.Reply);
+            Console.WriteLine("Got reply: ");
+            this.PrintFields(decision.Reply);
             Console.WriteLine("Got warnings: " + decision.Warnings.Count);
             Console.WriteLine("Got decision: " + decision.Reply.RuleEvents.Decision);
         }
@@ -180,7 +181,8 @@ namespace KountAccessExample
                 string name = descriptor.Name;
                 object value = descriptor.GetValue(obj);
 
-                Console.WriteLine(" {0}: {1}", name, value);
+                string strVal = (value == null) ? "null" : value.ToString();
+                Console.WriteLine(" {0}: {1}", name, strVal);
             }
         }
     }
