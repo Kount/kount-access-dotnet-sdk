@@ -2,7 +2,7 @@
 
 This is the actual Kount Access .NET SDK.
 
-Longer version of the code samples can be found [here](https://github.com/Kount/kount-access-dotnet-sdk/wiki/)
+Longer version of the code samples can be found [here](https://github.com/Kount/kount-access-dotnet-sdk/blob/master/KountAccessExample/Program.cs)
 
 Required:
 * Merchant ID
