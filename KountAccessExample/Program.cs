@@ -29,7 +29,7 @@ namespace KountAccessExample
     /// need to have made collector request(s) prior, and you'll have to use the session id(s) that were returned.
     ///
     /// @author custserv@kount.com
-    /// @version 2.1.0
+    /// @version 1.0.0
     /// @copyright 2017 Kount, Inc.All Rights Reserved.
     ///
     /// </summary>
