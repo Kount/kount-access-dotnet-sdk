@@ -5,6 +5,8 @@
 //-----------------------------------------------------------------------
 namespace KountAccessTest
 {
+    using KountAccessSdk.Interfaces;
+    using KountAccessSdk.Log.Factory;
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,6 +20,11 @@ namespace KountAccessTest
     [TestClass]
     public class AccessSDKTest
     {
+        /// <summary>
+        /// The Logger to use.
+        /// </summary>
+        private ILogger logger;
+
         private const string DEAFULT_VERSION = "0210"; 
         // Setup data for comparisons.
         private static int merchantId = 999999;
@@ -46,6 +53,9 @@ namespace KountAccessTest
         [TestInitialize]
         public void TestSdkInit()
         {
+            ILoggerFactory factory = LogFactory.GetLoggerFactory();
+            this.logger = factory.GetLogger(typeof(AccessSDKTest).ToString());
+
             deviceInfo = new DeviceInfo();
             deviceInfo.Device = new Device { Country = ipGeo, Region = "ID", GeoLat = 43.37, GeoLong = -116.200, Id = fingerprint, IpAddress = ipAddress, IpGeo = ipGeo, Mobile = 1, Proxy = 0 };
             deviceInfo.ResponceId = responseId;
@@ -177,6 +187,8 @@ namespace KountAccessTest
                 AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
 
                 DeviceInfo dInfo = sdk.GetDevice(session);
+                this.logger.Debug(JsonConvert.SerializeObject(dInfo));
+
                 Assert.IsNotNull(dInfo);
                 Assert.AreEqual(fingerprint, dInfo.Device.Id);
                 Assert.AreEqual(ipAddress, dInfo.Device.IpAddress);
@@ -230,6 +242,8 @@ namespace KountAccessTest
 
                 Assert.IsNotNull(vInfo);
 
+                this.logger.Debug(JsonConvert.SerializeObject(vInfo));
+
                 Assert.IsTrue(velocityInfo.Velocity.Password.Equals(vInfo.Velocity.Password));
                 Assert.AreEqual(vInfo.ResponseId, responseId);
 
@@ -279,6 +293,9 @@ namespace KountAccessTest
                 DecisionInfo decisionInfo = sdk.GetDecision(session, user, password);
 
                 Assert.IsNotNull(decisionInfo);
+
+                this.logger.Debug(JsonConvert.SerializeObject(decisionInfo));
+
 
                 Assert.AreEqual(decision, decisionInfo.Decision.Reply.RuleEvents.Decision);
 
