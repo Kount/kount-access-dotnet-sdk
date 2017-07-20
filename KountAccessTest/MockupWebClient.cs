@@ -17,20 +17,20 @@ namespace KountAccessTest
     /// </summary>
     public class MockupWebClient : WebClient, IWebClient
     {
-        private string jsonResponce = String.Empty;
+        private string jsonResponse = String.Empty;
 
-        public MockupWebClient(string jsonResponce)
+        public MockupWebClient(string jsonResponse)
         {
-            this.jsonResponce = jsonResponce;
+            this.jsonResponse = jsonResponse;
         }
 
         public new string DownloadString(string address)
         {
             if (base.BaseAddress.Equals("gty://bad.host.com/"))
             {
-                throw new WebException("Server not responce", WebExceptionStatus.ConnectionClosed);
+                throw new WebException("Server not respond", WebExceptionStatus.ConnectionClosed);
             }
-            return this.jsonResponce;
+            return this.jsonResponse;
         }
 
         public new byte[] UploadValues(string address, string method, NameValueCollection data)
@@ -43,7 +43,7 @@ namespace KountAccessTest
 
                 throw new WebException("Protocol Test Error", new Exception("Test exception"), WebExceptionStatus.ProtocolError, response);
             }
-            return Encoding.UTF8.GetBytes(this.jsonResponce);
+            return Encoding.UTF8.GetBytes(this.jsonResponse);
         }
     }
 
@@ -52,16 +52,16 @@ namespace KountAccessTest
     /// </summary>
     public class MockupWebClientFactory : IWebClientFactory
     {
-        public MockupWebClientFactory(string jsonResponce)
+        public MockupWebClientFactory(string jsonResponse)
         {
-            this.jsonResponce = jsonResponce;
+            this.jsonResponse = jsonResponse;
         }
 
-        private string jsonResponce = String.Empty;
+        private string jsonResponse = String.Empty;
 
         public IWebClient Create()
         {
-            return new MockupWebClient(this.jsonResponce);
+            return new MockupWebClient(this.jsonResponse);
         }
     }
 

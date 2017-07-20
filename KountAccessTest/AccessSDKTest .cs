@@ -25,7 +25,7 @@ namespace KountAccessTest
         /// </summary>
         private ILogger logger;
 
-        private const string DEAFULT_VERSION = "0210"; 
+        private const string DEFAULT_VERSION = "0210"; 
         // Setup data for comparisons.
         private static int merchantId = 999999;
 
@@ -58,7 +58,7 @@ namespace KountAccessTest
 
             deviceInfo = new DeviceInfo();
             deviceInfo.Device = new Device { Country = ipGeo, Region = "ID", GeoLat = 43.37, GeoLong = -116.200, Id = fingerprint, IpAddress = ipAddress, IpGeo = ipGeo, Mobile = 1, Proxy = 0 };
-            deviceInfo.ResponceId = responseId;
+            deviceInfo.ResponseId = responseId;
             jsonDevInfo = JsonConvert.SerializeObject(deviceInfo);
 
             velocityInfo = new VelocityInfo();
@@ -74,7 +74,7 @@ namespace KountAccessTest
 
             decisionInfo = new DecisionInfo();
             decisionInfo.Device = deviceInfo.Device;
-            decisionInfo.ResponceId = responseId;
+            decisionInfo.ResponseId = responseId;
             decisionInfo.Velocity = velocityInfo.Velocity;
             decisionInfo.Decision = new Decision
             {
@@ -203,7 +203,7 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDevInfo);
 
-                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 DeviceInfo dInfo = sdk.GetDevice(session);
 
@@ -215,7 +215,7 @@ namespace KountAccessTest
                 Assert.AreEqual(ipGeo, dInfo.Device.IpGeo);
                 Assert.AreEqual(1, dInfo.Device.Mobile);
                 Assert.AreEqual(0, dInfo.Device.Proxy);
-                Assert.AreEqual(responseId, dInfo.ResponceId);
+                Assert.AreEqual(responseId, dInfo.ResponseId);
 
             }
             catch (AccessException ae)
@@ -233,7 +233,7 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDevInfo);
 
-                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 DeviceInfo dInfo = sdk.GetDevice(session);
 
@@ -256,7 +256,7 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonVeloInfo);
 
-                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 VelocityInfo vInfo = sdk.GetVelocity(session, user, password);
 
@@ -284,7 +284,7 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonVeloInfo);
 
-                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 VelocityInfo vInfo = sdk.GetVelocity(session, user, password);
 
@@ -308,7 +308,7 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDeciInfo);
 
-                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 DecisionInfo decisionInfo = sdk.GetDecision(session, user, password);
 

@@ -24,7 +24,7 @@ namespace KountAccessSdk.Service
         /// </summary>
         private ILogger logger;
 
-        private const string DEAFULT_VERSION = "0210";
+        private const string DEFAULT_VERSION = "0210";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -42,7 +42,7 @@ namespace KountAccessSdk.Service
         /// <param name="apiKey">apiKey The API Key for the merchant.</param>
         /// <param name="version">version The version of the API response to return.</param>
         /// <param name="webClientFactory">used for webClient mockup in tests.</param>
-        public AccessSdk(string host, int merchantId, string apiKey, string version = DEAFULT_VERSION, IWebClientFactory webClientFactory = null)
+        public AccessSdk(string host, int merchantId, string apiKey, string version = DEFAULT_VERSION, IWebClientFactory webClientFactory = null)
         {
             if (webClientFactory == null)
             {

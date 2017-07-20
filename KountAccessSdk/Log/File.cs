@@ -18,19 +18,19 @@ namespace KountAccessSdk.Log
     public class File
     {
         /// <summary>
+        /// default log file name
+        /// </summary>
+        private const string LOG_FILE = "Kount-Access-DotNet-SDK.log";
+
+        /// <summary>
+        /// default relative log path. Root folder is location of KountAccessSDK.dll
+        /// </summary>
+        private const string LOG_PATH = "Logs";
+
+        /// <summary>
         /// Debug log level
         /// </summary>
         private const string LogDebug = "DEBUG";
-
-        /// <summary>
-        /// Info log level
-        /// </summary>
-        private const string LogInfo = "INFO";
-
-        /// <summary>
-        /// Warn log level
-        /// </summary>
-        private const string LogWarn = "WARN";
 
         /// <summary>
         /// Error log level
@@ -43,15 +43,14 @@ namespace KountAccessSdk.Log
         private const string LogFatal = "FATAL";
 
         /// <summary>
-        /// Hashtable of log levels
+        /// Info log level
         /// </summary>
-        private System.Collections.Hashtable logLevels =
-            new System.Collections.Hashtable();
+        private const string LogInfo = "INFO";
 
         /// <summary>
-        /// Name of the logger
+        /// Warn log level
         /// </summary>
-        private string loggerName;
+        private const string LogWarn = "WARN";
 
         /// <summary>
         /// Log level in configuration
@@ -64,12 +63,15 @@ namespace KountAccessSdk.Log
         private string logFilePath;
 
         /// <summary>
-        /// Configurable property. In `app.config` set setting `LOG.SIMPLE.ELAPSED` to <b>ON/OFF</b><br/>
-        /// example: 
-        /// <example>`<add key="LOG.SIMPLE.ELAPSED" value="ON" />`</example><br/>
-        /// In case is not set is `OFF`.
+        /// Name of the logger
         /// </summary>
-        public string SdkElapsed { get; private set; }
+        private string loggerName;
+
+        /// <summary>
+        /// Hashtable of log levels
+        /// </summary>
+        private System.Collections.Hashtable logLevels =
+            new System.Collections.Hashtable();
 
         /// <summary>
         /// Constructor for file logger.
@@ -87,17 +89,20 @@ namespace KountAccessSdk.Log
 
             this.SdkElapsed = ConfigurationManager.AppSettings["LOG.SIMPLE.ELAPSED"];
             this.configLogLevel = ConfigurationManager.AppSettings["LOG.SIMPLE.LEVEL"];
+
             string logFile = ConfigurationManager.AppSettings["LOG.SIMPLE.FILE"];
             string logPath = ConfigurationManager.AppSettings["LOG.SIMPLE.PATH"];
-            this.logFilePath = logPath + "\\" + logFile;
 
-            if (!Directory.Exists(logPath))
-            {
-                Directory.CreateDirectory(logPath);
-            }
-
-            this.logFilePath = new Uri(Path.Combine(logPath, logFile)).LocalPath;
+            this.logFilePath = GetLoggFilePath(logPath, logFile);
         }
+
+        /// <summary>
+        /// Configurable property. In `app.config` set setting `LOG.SIMPLE.ELAPSED` to <b>ON/OFF</b><br/>
+        /// example:
+        /// <example>`<add key="LOG.SIMPLE.ELAPSED" value="ON" />`</example><br/>
+        /// In case is not set is `OFF`.
+        /// </summary>
+        public string SdkElapsed { get; private set; }
 
         /// <summary>
         /// Log a debug level message.
@@ -116,44 +121,6 @@ namespace KountAccessSdk.Log
         public void Debug(string message, Exception e)
         {
             this.ProcessMessage(message, LogDebug, e);
-        }
-
-        /// <summary>
-        /// Log an info level message.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public void Info(string message)
-        {
-            this.ProcessMessage(message, LogInfo, null);
-        }
-
-        /// <summary>
-        /// Log an info level message and exception.
-        /// </summary>
-        /// <param name="message">Mesage to log</param>
-        /// <param name="e">Exception to log</param>
-        public void Info(string message, Exception e)
-        {
-            this.ProcessMessage(message, LogInfo, e);
-        }
-
-        /// <summary>
-        /// Log a warn level message.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public void Warn(string message)
-        {
-            this.ProcessMessage(message, LogWarn, null);
-        }
-
-        /// <summary>
-        /// Log a warn level message and exception.
-        /// </summary>
-        /// <param name="message">Mesage to log</param>
-        /// <param name="e">Exception to log</param>
-        public void Warn(string message, Exception e)
-        {
-            this.ProcessMessage(message, LogWarn, e);
         }
 
         /// <summary>
@@ -195,22 +162,41 @@ namespace KountAccessSdk.Log
         }
 
         /// <summary>
-        /// Process a log message, by determining if it should be logged,
-        /// formatting the message, and logging it.
+        /// Log an info level message.
         /// </summary>
         /// <param name="message">Message to log</param>
-        /// <param name="level">Logging level</param>
-        /// <param name="e">Exception to log</param>
-        protected void ProcessMessage(
-            string message,
-            string level,
-            Exception e)
+        public void Info(string message)
         {
-            if (this.IsLoggable(level))
-            {
-                message = this.FormatMessage(message, level, e);
-                this.Log(message);
-            }
+            this.ProcessMessage(message, LogInfo, null);
+        }
+
+        /// <summary>
+        /// Log an info level message and exception.
+        /// </summary>
+        /// <param name="message">Mesage to log</param>
+        /// <param name="e">Exception to log</param>
+        public void Info(string message, Exception e)
+        {
+            this.ProcessMessage(message, LogInfo, e);
+        }
+
+        /// <summary>
+        /// Log a warn level message.
+        /// </summary>
+        /// <param name="message">Message to log</param>
+        public void Warn(string message)
+        {
+            this.ProcessMessage(message, LogWarn, null);
+        }
+
+        /// <summary>
+        /// Log a warn level message and exception.
+        /// </summary>
+        /// <param name="message">Mesage to log</param>
+        /// <param name="e">Exception to log</param>
+        public void Warn(string message, Exception e)
+        {
+            this.ProcessMessage(message, LogWarn, e);
         }
 
         /// <summary>
@@ -241,6 +227,24 @@ namespace KountAccessSdk.Log
         }
 
         /// <summary>
+        /// Determine if a message should be logged based on the logging
+        /// level defined in the app configuration.
+        /// </summary>
+        /// <param name="level">Logging level of the message</param>
+        /// <returns>True if the message should be logged, false otherwise</returns>
+        protected bool IsLoggable(string level)
+        {
+            int configLevel = (int)this.logLevels[this.configLogLevel];
+            int methodLevel = (int)this.logLevels[level];
+            if (methodLevel >= configLevel)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Log a message.
         /// </summary>
         /// <param name="message">Message to log</param>
@@ -258,21 +262,50 @@ namespace KountAccessSdk.Log
         }
 
         /// <summary>
-        /// Determine if a message should be logged based on the logging
-        /// level defined in the app configuration.
+        /// Process a log message, by determining if it should be logged,
+        /// formatting the message, and logging it.
         /// </summary>
-        /// <param name="level">Logging level of the message</param>
-        /// <returns>True if the message should be logged, false otherwise</returns>
-        protected bool IsLoggable(string level)
+        /// <param name="message">Message to log</param>
+        /// <param name="level">Logging level</param>
+        /// <param name="e">Exception to log</param>
+        protected void ProcessMessage(
+            string message,
+            string level,
+            Exception e)
         {
-            int configLevel = (int)this.logLevels[this.configLogLevel];
-            int methodLevel = (int)this.logLevels[level];
-            if (methodLevel >= configLevel)
+            if (this.IsLoggable(level))
             {
-                return true;
+                message = this.FormatMessage(message, level, e);
+                this.Log(message);
+            }
+        }
+
+        private static string GetLoggFilePath(string logPath, string logFile)
+        {
+            if (String.IsNullOrEmpty(logPath))
+            {
+                logPath = LOG_PATH;
             }
 
-            return false;
+            if (String.IsNullOrEmpty(logFile))
+            {
+                logFile = LOG_FILE;
+            }
+
+            Uri uri = new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
+            string appPath = Path.GetDirectoryName(uri.LocalPath);
+
+            string lPath = Path.Combine(appPath, logPath);
+
+            // create relative directory if not exist
+            if (!Directory.Exists(lPath))
+            {
+                Directory.CreateDirectory(lPath);
+            }
+
+            var lpf = new Uri(Path.Combine(lPath, logFile)).LocalPath;
+
+            return lpf;
         }
     }
 }
