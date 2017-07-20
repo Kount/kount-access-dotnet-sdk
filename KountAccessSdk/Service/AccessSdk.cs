@@ -418,7 +418,7 @@ namespace KountAccessSdk.Service
         /// </summary>
         /// <param name="strData">The String to convert</param>
         /// <returns>The converted string.</returns>
-        private static string HashValue(string strData)
+        public static string HashValue(string strData)
         {
             var message = Encoding.UTF8.GetBytes(strData);
             string hex = "";

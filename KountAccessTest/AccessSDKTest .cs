@@ -178,6 +178,25 @@ namespace KountAccessTest
         }
 
         [TestMethod]
+        public void TestHashValue()
+        {
+            try
+            {
+                var hash = AccessSdk.HashValue("admin");
+                Assert.AreEqual("8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", hash);
+
+                var pass = AccessSdk.HashValue("password");
+                Assert.AreEqual("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", pass);
+
+            }
+            catch (AccessException ae)
+            {
+
+                Assert.Fail($"Bad exception {ae.ErrorType}:{ae.Message}");
+            }
+        }
+
+        [TestMethod]
         public void TestGetDevice()
         {
             try
@@ -187,9 +206,10 @@ namespace KountAccessTest
                 AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
 
                 DeviceInfo dInfo = sdk.GetDevice(session);
-                this.logger.Debug(JsonConvert.SerializeObject(dInfo));
 
                 Assert.IsNotNull(dInfo);
+                this.logger.Debug(JsonConvert.SerializeObject(dInfo));
+
                 Assert.AreEqual(fingerprint, dInfo.Device.Id);
                 Assert.AreEqual(ipAddress, dInfo.Device.IpAddress);
                 Assert.AreEqual(ipGeo, dInfo.Device.IpGeo);
