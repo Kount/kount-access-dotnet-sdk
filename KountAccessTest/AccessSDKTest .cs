@@ -5,6 +5,8 @@
 //-----------------------------------------------------------------------
 namespace KountAccessTest
 {
+    using KountAccessSdk.Interfaces;
+    using KountAccessSdk.Log.Factory;
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,7 +20,12 @@ namespace KountAccessTest
     [TestClass]
     public class AccessSDKTest
     {
-        private const string DEAFULT_VERSION = "0210"; 
+        /// <summary>
+        /// The Logger to use.
+        /// </summary>
+        private ILogger logger;
+
+        private const string DEFAULT_VERSION = "0210"; 
         // Setup data for comparisons.
         private static int merchantId = 999999;
 
@@ -46,9 +53,12 @@ namespace KountAccessTest
         [TestInitialize]
         public void TestSdkInit()
         {
+            ILoggerFactory factory = LogFactory.GetLoggerFactory();
+            this.logger = factory.GetLogger(typeof(AccessSDKTest).ToString());
+
             deviceInfo = new DeviceInfo();
             deviceInfo.Device = new Device { Country = ipGeo, Region = "ID", GeoLat = 43.37, GeoLong = -116.200, Id = fingerprint, IpAddress = ipAddress, IpGeo = ipGeo, Mobile = 1, Proxy = 0 };
-            deviceInfo.ResponceId = responseId;
+            deviceInfo.ResponseId = responseId;
             jsonDevInfo = JsonConvert.SerializeObject(deviceInfo);
 
             velocityInfo = new VelocityInfo();
@@ -64,7 +74,7 @@ namespace KountAccessTest
 
             decisionInfo = new DecisionInfo();
             decisionInfo.Device = deviceInfo.Device;
-            decisionInfo.ResponceId = responseId;
+            decisionInfo.ResponseId = responseId;
             decisionInfo.Velocity = velocityInfo.Velocity;
             decisionInfo.Decision = new Decision
             {
@@ -168,22 +178,44 @@ namespace KountAccessTest
         }
 
         [TestMethod]
+        public void TestHashValue()
+        {
+            try
+            {
+                var hash = AccessSdk.HashValue("admin");
+                Assert.AreEqual("8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", hash);
+
+                var pass = AccessSdk.HashValue("password");
+                Assert.AreEqual("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", pass);
+
+            }
+            catch (AccessException ae)
+            {
+
+                Assert.Fail($"Bad exception {ae.ErrorType}:{ae.Message}");
+            }
+        }
+
+        [TestMethod]
         public void TestGetDevice()
         {
             try
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDevInfo);
 
-                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 DeviceInfo dInfo = sdk.GetDevice(session);
+
                 Assert.IsNotNull(dInfo);
+                this.logger.Debug(JsonConvert.SerializeObject(dInfo));
+
                 Assert.AreEqual(fingerprint, dInfo.Device.Id);
                 Assert.AreEqual(ipAddress, dInfo.Device.IpAddress);
                 Assert.AreEqual(ipGeo, dInfo.Device.IpGeo);
                 Assert.AreEqual(1, dInfo.Device.Mobile);
                 Assert.AreEqual(0, dInfo.Device.Proxy);
-                Assert.AreEqual(responseId, dInfo.ResponceId);
+                Assert.AreEqual(responseId, dInfo.ResponseId);
 
             }
             catch (AccessException ae)
@@ -201,7 +233,7 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDevInfo);
 
-                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 DeviceInfo dInfo = sdk.GetDevice(session);
 
@@ -224,11 +256,13 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonVeloInfo);
 
-                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 VelocityInfo vInfo = sdk.GetVelocity(session, user, password);
 
                 Assert.IsNotNull(vInfo);
+
+                this.logger.Debug(JsonConvert.SerializeObject(vInfo));
 
                 Assert.IsTrue(velocityInfo.Velocity.Password.Equals(vInfo.Velocity.Password));
                 Assert.AreEqual(vInfo.ResponseId, responseId);
@@ -250,7 +284,7 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonVeloInfo);
 
-                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk("gty://bad.host.com", merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 VelocityInfo vInfo = sdk.GetVelocity(session, user, password);
 
@@ -274,11 +308,14 @@ namespace KountAccessTest
             {
                 MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDeciInfo);
 
-                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEAFULT_VERSION, mockFactory);
+                AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
                 DecisionInfo decisionInfo = sdk.GetDecision(session, user, password);
 
                 Assert.IsNotNull(decisionInfo);
+
+                this.logger.Debug(JsonConvert.SerializeObject(decisionInfo));
+
 
                 Assert.AreEqual(decision, decisionInfo.Decision.Reply.RuleEvents.Decision);
 

@@ -17,6 +17,6 @@ namespace KountAccessSdk.Models
         public Device Device { get; set; }
 
         [JsonProperty("response_id")]
-        public string ResponceId { get; set; }
+        public string ResponseId { get; set; }
     }
 }

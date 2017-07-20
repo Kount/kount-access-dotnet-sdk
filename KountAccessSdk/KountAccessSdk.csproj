@@ -35,6 +35,7 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,8 +45,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\ILogger.cs" />
+    <Compile Include="Interfaces\ILoggerFactory.cs" />
     <Compile Include="Interfaces\IWebClient.cs" />
     <Compile Include="Interfaces\IWebClientFactory.cs" />
+    <Compile Include="Log\Binding\NopLogger.cs" />
+    <Compile Include="Log\Binding\SimpleLogger.cs" />
+    <Compile Include="Log\ExampleClient.cs" />
+    <Compile Include="Log\Factory\LogFactory.cs" />
+    <Compile Include="Log\Factory\NopLoggerFactory.cs" />
+    <Compile Include="Log\Factory\SimpleLoggerFactory.cs" />
     <Compile Include="Models\AccessException.cs" />
     <Compile Include="Models\Decision.cs" />
     <Compile Include="Models\DecisionInfo.cs" />
@@ -65,8 +74,12 @@
     <Compile Include="Service\SystemWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Log\File.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Log\App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

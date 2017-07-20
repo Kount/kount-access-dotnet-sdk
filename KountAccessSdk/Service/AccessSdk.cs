@@ -6,6 +6,7 @@
 namespace KountAccessSdk.Service
 {
     using KountAccessSdk.Interfaces;
+    using KountAccessSdk.Log.Factory;
     using KountAccessSdk.Models;
     using Newtonsoft.Json;
     using System;
@@ -18,7 +19,12 @@ namespace KountAccessSdk.Service
 
     public class AccessSdk
     {
-        private const string DEAFULT_VERSION = "0210";
+        /// <summary>
+        /// The Logger to use.
+        /// </summary>
+        private ILogger logger;
+
+        private const string DEFAULT_VERSION = "0210";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -36,7 +42,7 @@ namespace KountAccessSdk.Service
         /// <param name="apiKey">apiKey The API Key for the merchant.</param>
         /// <param name="version">version The version of the API response to return.</param>
         /// <param name="webClientFactory">used for webClient mockup in tests.</param>
-        public AccessSdk(string host, int merchantId, string apiKey, string version = DEAFULT_VERSION, IWebClientFactory webClientFactory = null)
+        public AccessSdk(string host, int merchantId, string apiKey, string version = DEFAULT_VERSION, IWebClientFactory webClientFactory = null)
         {
             if (webClientFactory == null)
             {
@@ -64,10 +70,24 @@ namespace KountAccessSdk.Service
 
             this._host = host ?? throw new AccessException(AccessErrorType.INVALID_DATA, "Missing host");
 
+            ILoggerFactory factory = LogFactory.GetLoggerFactory();
+            this.logger = factory.GetLogger(typeof(AccessSdk).ToString());
+
+
             this._merchantId = merchantId;
             this._apiKey = apiKey.Trim();
             this._version = version;
             this._encodedCredentials = GetBase64Credentials(merchantId.ToString(), apiKey);
+
+            var velocityEndpoint = host + "/api/velocity";
+            var deviceEndpoint = host + "/api/device";
+            var decisionEndpoint = host + "/api/decision";
+
+
+            this.logger.Info("Access SDK using merchantId = " + merchantId + ", host = " + host);
+            this.logger.Debug("velocity endpoint: " + velocityEndpoint);
+            this.logger.Debug("decision endpoint: " + decisionEndpoint);
+            this.logger.Debug("device endpoint: " + deviceEndpoint);
         }
 
         /// <summary>
@@ -398,7 +418,7 @@ namespace KountAccessSdk.Service
         /// </summary>
         /// <param name="strData">The String to convert</param>
         /// <returns>The converted string.</returns>
-        private static string HashValue(string strData)
+        public static string HashValue(string strData)
         {
             var message = Encoding.UTF8.GetBytes(strData);
             string hex = "";
