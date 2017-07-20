@@ -28,7 +28,7 @@ namespace KountAccessTest
         {
             if (base.BaseAddress.Equals("gty://bad.host.com/"))
             {
-                throw new WebException("Server not respond", WebExceptionStatus.ConnectionClosed);
+                throw new WebException("Server not responding.", WebExceptionStatus.ConnectionClosed);
             }
             return this.jsonResponse;
         }
