@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KountAccessSdk", "KountAccessSdk\KountAccessSdk.csproj", "{D29A348E-F29B-49BA-A19D-DC1BF1766F63}"
 EndProject
@@ -12,6 +12,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{08866110-60EB-4052-9125-6BFE3FA272A5}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE = LICENSE
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{6A3EACF8-B418-4224-92D1-215C4AF22161}"
+	ProjectSection(SolutionItems) = preProject
+		builds\create_nuGet_package.bat = builds\create_nuGet_package.bat
+		builds\nuget.exe = builds\nuget.exe
 	EndProjectSection
 EndProject
 Global

@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("KountAccessSdk")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Kount Access Sdk")]
+[assembly: AssemblyDescription(".NET version of the Kount Access SDK")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("KountAccessSdk")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCompany("Kount Inc.")]
+[assembly: AssemblyProduct("Kount Access Sdk")]
+[assembly: AssemblyCopyright("Copyright © Kount Inc. 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
