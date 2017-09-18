@@ -36,15 +36,15 @@ namespace KountAccessExample
     public class KountAccessExample
     {
         /**
-         * Fake user session (this should be retrieved from the Kount Access Data Collector Client SDK.) This will be a 32
-         * character hash value
+         * Fake user session (this should be retrieved from the Kount Access Data Collector Client SDK.) This will be a
+         * value up to 32 characters.
          */
         private string session = "abcdef12345678910abcdef123456789"; // "THIS_IS_THE_USERS_SESSION_FROM_JAVASCRIPT_CLIENT_SDK";
 
         /**
-         * Merchant's customer ID at Kount. This will be the same for all environments.
+         * Merchant's customer ID at Kount. This should be the id you were issued from Kount.
          */
-        private int merchantId = 100100;
+        private int merchantId = 0;
 
         /**
          * This should be the API Key you were issued from Kount.
@@ -52,10 +52,10 @@ namespace KountAccessExample
         private string apiKey = "PUT_YOUR_API_KEY_HERE";
 
         /**
-         * Sample host. this should be the name of the Kount Access API server you want to connect to. We will use sandbox02
+         * Sample host. this should be the name of the Kount Access API server you want to connect to. We will use sandbox01
          * as the example.
          */
-        private string host = "https://api-sandbox02.kountaccess.com";
+        private string host = "https://api-sandbox01.kountaccess.com";
 
         /// <summary>
         /// Simple Example within the Constructor.

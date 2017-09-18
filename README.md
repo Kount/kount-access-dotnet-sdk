@@ -1,59 +1,38 @@
-# kount-access-dotnet-sdk
+# Kount Access API SDK
 
-This is the actual Kount Access .NET SDK.
+## Overview
 
-Longer version of the code samples can be found [here](https://github.com/Kount/kount-access-dotnet-sdk/blob/master/KountAccessExample/Program.cs)
+**Kount Access** is here to help you fight login fraud.  It's designed for high-volume and targeted for account creation and affiliate networks.  It cross-checks individual components with several other components to calculate the velocity of related login attempts, and provides you with dozens of velocity checks and essential data to help determine the legitimacy of the user and account owners.
 
-Required:
-* Merchant ID
-* API Key
-* Kount Access service host
+After your user submits their credentials for login (data collection is completed), you can request:
+* information about the device
+* velocity details (the tallies of credential combinations used) about the user's login attempt(s)
+* an automated decision to approve the login, based on tolerances you set based on velocity
 
-Create an SDK object:
-```cs
-AccessSdk sdk = new AccessSdk(accessHost, merchantId, apiKey);
-```
+Each response is returned in JSON format.
+This information enables you to make business decisions on how your site should to proceed with a user's login.
 
-Retrieve device information collected by the Data Collector:
+The **Kount Access API SDK** is used directly in your website (or authentication service) that handles user login.
+The Kount Access API SDK should be integrated into the client code so that it is called
+after the user submits their login, typically where the login form `POST` is handled.
+This will be used regardless of whether the login is successful or not.
 
-```cs
-// sessionId, 32-character identifier, applied for customer session, provided to data collector
-DeviceInfo deviceInformation = sdk.GetDevice(sessionId);
+For more information on what Kount Access is, go to http://www.kount.com
 
-// IP address
-Console.WriteLine("IP Address: " + deviceInformation.Device.IpAddress);
-Console.WriteLine("IP Geo(Country): " + deviceInformation.Device.IpGeo);
-Console.WriteLine("Proxy: " + deviceInformation.Device.Proxy); // 1 (true) or 0 
-// mobile device?
-Console.WriteLine("Mobile: " + deviceInformation.Device.Mobile); // 1 (true) or 0 (false)
-```
+## Requirements
 
-Get velocity for one of our customers:
-```cs
-// for greater security, username and password are internally hashed before transmitting the request
-// you can hash them yourself, this wouldn't affect the Kount Access Service
-VelocityInfo accessInfo = sdk.GetVelocity(sessionId, username, password);
+Ensure you have the information needed to instantiate the library in your app.
 
-// you can get the device information from the accessInfo object
-Device device = accessInfo.Device;
+*  **merchant ID** - Your merchant ID provided to you from Kount.
+*  **API Key** - The API key you generated from Kount (or was provided to you).
+*  **Server Name** - The DNS name of the server you want to connect. These are also provided by Kount.  You should have one server assigned for testing and one for production.
+*  **version** - The version of the API to access (defaults to the current version).  The version is in the form of a 4 digit string.
 
-string jsonVeloInfo = JsonConvert.SerializeObject(accessInfo);
-Console.WriteLine(jsonVeloInfo); // this is the full response, which may be huge
+## Supported Versions
 
-// and let's get the number of unique user accounts used by the current sessions device within the last hour
-int numUsersForDevice = accessInfo.Velocity.Device.ulh;
-Console.WriteLine(
-  "The number of unique user access request(s) this hour for this device is:" + numUsersForDevice);
-```
+Kount Access API Versions:
 
-And last, the `decision` endpoint usage:
+* 0200
+* 0210 (default)
 
-```cs
-DecisionInfo decisionInfo = sdk.GetDecision(sessionId, username, password); // those again are hashed internally
-Decision decision = this.decisionInfo.Decision;
-Console.WriteLine("errors: " + decision.Errors.Count);
-Console.WriteLine("warnings: " + decision.Warnings.Count);
-// and the Kount Access decision itself
-Console.WriteLine("decision: " + decision.Reply.RuleEvents.Decision);
-```
-
+For more information on using this library, consult the wiki section.
