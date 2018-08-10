@@ -51,6 +51,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataSetElementsTest.cs" />
     <Compile Include="MockupWebClient.cs">
       <SubType>Component</SubType>
     </Compile>

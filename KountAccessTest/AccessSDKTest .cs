@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------
 namespace KountAccessTest
 {
+    using KountAccessSdk.Enums;
     using KountAccessSdk.Interfaces;
     using KountAccessSdk.Log.Factory;
     using KountAccessSdk.Models;
@@ -25,7 +26,7 @@ namespace KountAccessTest
         /// </summary>
         private ILogger logger;
 
-        private const string DEFAULT_VERSION = "0210"; 
+        private const string DEFAULT_VERSION = "0400"; 
         // Setup data for comparisons.
         private static int merchantId = 999999;
 
@@ -41,14 +42,17 @@ namespace KountAccessTest
         private static string ipGeo = "US";
         private static string responseId = "bf10cd20cf61286669e87342d029e405";
         private static string decision = "A";
+        private static string uniq = "55e9fbfda2ce489d83b4a99c84c6f3e1";
 
         private DeviceInfo deviceInfo;
         private DecisionInfo decisionInfo;
         private VelocityInfo velocityInfo;
+        private Info info;
 
         private string jsonDevInfo;
         private string jsonVeloInfo;
         private string jsonDeciInfo;
+        private string jsonInfo;
 
         [TestInitialize]
         public void TestSdkInit()
@@ -92,6 +96,23 @@ namespace KountAccessTest
             };
 
             jsonDeciInfo = JsonConvert.SerializeObject(decisionInfo);
+
+            info = new Info();
+            info.Device = deviceInfo.Device;
+            info.Decision = decisionInfo.Decision;
+            info.Velocity = velocityInfo.Velocity;
+            info.ResponseId = responseId;
+            info.Trusted = new TrustState() { State = DeviceTrustState.Trusted };
+            info.BehavioSec = new BehavioSec()
+            {
+                Confidence = 0,
+                IsBot = false,
+                IsTrained = false,
+                PolicyId = 4,
+                Score = 0
+            };
+
+            jsonInfo = JsonConvert.SerializeObject(info);
         }
 
         [TestMethod]
@@ -330,6 +351,236 @@ namespace KountAccessTest
 
         }
 
+        #region Get Info Tests
+        [TestMethod]
+        public void TestGetInfo()
+        {
+            // Arrange
+            MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonInfo);
+            AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
+            var allDataSets = new DataSetElements()
+                    .WithInfo()
+                    .WithVelocity()
+                    .WithDecision()
+                    .WithTrusted()
+                    .WithBehavioSec()
+                    .Build();
 
+            // Act
+            Info infoResp = sdk.GetInfo(session, user, password, uniq, allDataSets);           
+
+            this.logger.Debug(JsonConvert.SerializeObject(info));
+
+            // Asert
+            Assert.IsNotNull(info);
+            Assert.AreEqual(info.ResponseId, infoResp.ResponseId);
+
+            Assert.AreEqual(info.Device.Id, infoResp.Device.Id);
+            Assert.IsTrue(info.Velocity.Password.Equals(infoResp.Velocity.Password));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AccessException))]
+        public void TestGetInfoWithoutSession_ShouldThrowException()
+        {
+            // Arrange
+            MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonInfo);
+            AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
+            var dataSets = new DataSetElements()
+                    .WithInfo()
+                    .Build();
+
+            var emptySessionId = "";
+
+            // Act
+            Info infoResp = sdk.GetInfo(emptySessionId, user, password, uniq, dataSets);
+
+            // Asert
+        }
+
+        [TestMethod]
+        [DataRow(1)] // WithInfo
+        [DataRow(2)] // WithVelocity
+        [DataRow(3)] // WithInfo and WithVelocity
+        [DataRow(4)] // WithDecision
+        [DataRow(5)] // WithInfo and WithDecision
+        [DataRow(6)] // WithVelocity and WithDecision
+        [DataRow(7)] // WithInfo, WithVelocity and WithDecision
+        public void TestGetInfoWithoutUniq_ShouldPassValidation(int dataSets)
+        {
+            // Arrange
+            MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonInfo);
+            AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
+            var emptyUniq = "";
+
+            // Act
+            Info infoResp = sdk.GetInfo(session, user, password, emptyUniq, dataSets);
+
+            // Asert
+            Assert.IsNotNull(infoResp);
+        }
+
+        [TestMethod]
+        [DataRow(8)] 
+        [DataRow(9)] 
+        [DataRow(10)] 
+        [DataRow(11)] 
+        [DataRow(12)] 
+        [DataRow(13)] 
+        [DataRow(14)] 
+        [DataRow(15)] 
+        [DataRow(16)] 
+        [DataRow(17)] 
+        [DataRow(18)] 
+        [DataRow(19)] 
+        [DataRow(20)] 
+        [DataRow(21)] 
+        [DataRow(22)] 
+        [DataRow(23)] 
+        [DataRow(24)] 
+        [DataRow(24)] 
+        [DataRow(25)] 
+        [DataRow(26)] 
+        [DataRow(27)] 
+        [DataRow(28)] 
+        [DataRow(29)] 
+        [DataRow(30)] 
+        [DataRow(31)] 
+        [ExpectedException(typeof(AccessException))]
+        public void TestGetInfoWithoutUniq_ShouldThrowException(int dataSets)
+        {
+            // Arrange
+            MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonInfo);
+            AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
+            var emptyUniq = "";
+
+            // Act
+            Info infoResp = sdk.GetInfo(session, user, password, emptyUniq, dataSets);
+
+            // Asert
+        }
+
+        [TestMethod]
+        [DataRow(1)] // WithInfo
+        [DataRow(8)] // WithTrusted
+        [DataRow(9)] // WithInfo and WithTrusted
+        [DataRow(16)] // WithBehavioSec
+        [DataRow(17)] // WithInfo and WithBehavioSec
+        [DataRow(24)] // WithTrusted and WithBehavioSec
+        [DataRow(25)] // WithInfo, WithTrusted and WithBehavioSec
+        public void TestGetInfoWithoutUser_ShouldPassValidation(int dataSets)
+        {
+            // Arrange
+            MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonInfo);
+            AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
+            var emptyUser = "";
+
+            // Act
+            Info infoResp = sdk.GetInfo(session, emptyUser, password, uniq, dataSets);
+
+            // Asert
+            Assert.IsNotNull(infoResp);
+        }
+
+        [TestMethod]
+        [DataRow(2)]
+        [DataRow(3)]
+        [DataRow(4)]
+        [DataRow(5)]
+        [DataRow(6)]
+        [DataRow(7)]
+        [DataRow(10)]
+        [DataRow(11)]
+        [DataRow(12)]
+        [DataRow(13)]
+        [DataRow(14)]
+        [DataRow(15)]
+        [DataRow(18)]
+        [DataRow(19)]
+        [DataRow(20)]
+        [DataRow(21)]
+        [DataRow(22)]
+        [DataRow(23)] 
+        [DataRow(26)]
+        [DataRow(27)]
+        [DataRow(28)]
+        [DataRow(29)]
+        [DataRow(30)]
+        [DataRow(31)]
+        [ExpectedException(typeof(AccessException))]
+        public void TestGetInfoWithoutUser_ShouldThrowException(int dataSets)
+        {
+            // Arrange
+            MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonInfo);
+            AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
+            var emptyUser = "";
+
+            // Act
+            Info infoResp = sdk.GetInfo(session, emptyUser, password, uniq, dataSets);
+
+            // Asert
+        }
+
+        [TestMethod]
+        [DataRow(1)] // WithInfo
+        [DataRow(8)] // WithTrusted
+        [DataRow(9)] // WithInfo and WithTrusted
+        [DataRow(16)] // WithBehavioSec
+        [DataRow(17)] // WithInfo and WithBehavioSec
+        [DataRow(24)] // WithTrusted and WithBehavioSec
+        [DataRow(25)] // WithInfo, WithTrusted and WithBehavioSec
+        public void TestGetInfoWithoutPassword_ShouldPassValidation(int dataSets)
+        {
+            // Arrange
+            MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonInfo);
+            AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
+            var emptyPassword = "";
+
+            // Act
+            Info infoResp = sdk.GetInfo(session, user, emptyPassword, uniq, dataSets);
+
+            // Asert
+            Assert.IsNotNull(infoResp);
+        }
+
+        [TestMethod]
+        [DataRow(2)] 
+        [DataRow(3)] 
+        [DataRow(4)] 
+        [DataRow(5)] 
+        [DataRow(6)] 
+        [DataRow(7)] 
+        [DataRow(10)]
+        [DataRow(11)]
+        [DataRow(12)]
+        [DataRow(13)]
+        [DataRow(14)]
+        [DataRow(15)]
+        [DataRow(18)]
+        [DataRow(19)]
+        [DataRow(20)]
+        [DataRow(21)]
+        [DataRow(22)]
+        [DataRow(23)]
+        [DataRow(26)]
+        [DataRow(27)]
+        [DataRow(28)]
+        [DataRow(29)]
+        [DataRow(30)]
+        [DataRow(31)]
+        [ExpectedException(typeof(AccessException))]
+        public void TestGetInfoWithoutPassword_ShouldThrowException(int dataSets)
+        {
+            // Arrange
+            MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonInfo);
+            AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
+            var emptyPassword = "";
+
+            // Act
+            Info infoResp = sdk.GetInfo(session, user, emptyPassword, uniq, dataSets);
+
+            // Asert
+        }
+        #endregion
     }
 }

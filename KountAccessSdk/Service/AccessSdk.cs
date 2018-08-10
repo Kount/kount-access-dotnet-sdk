@@ -22,9 +22,9 @@ namespace KountAccessSdk.Service
         /// <summary>
         /// The Logger to use.
         /// </summary>
-        private ILogger logger;
+        private readonly ILogger _logger;
 
-        private const string DEFAULT_VERSION = "0210";
+        private const string DEFAULT_VERSION = "0400";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -32,7 +32,7 @@ namespace KountAccessSdk.Service
         private readonly int _merchantId;
 
         private readonly string _version;
-        private IWebClientFactory webClientFactory;
+        private readonly IWebClientFactory _webClientFactory;
 
         /// <summary>
         /// Creates instance of the AccessSdk, allowing the client to specify version of responses to request.
@@ -41,16 +41,16 @@ namespace KountAccessSdk.Service
         /// <param name="merchantId">merchantId Merchant ID (6 digit value).</param>
         /// <param name="apiKey">apiKey The API Key for the merchant.</param>
         /// <param name="version">version The version of the API response to return.</param>
-        /// <param name="webClientFactory">used for webClient mockup in tests.</param>
+        /// <param name="webClientFactory">Used for webClient mockup in tests.</param>
         public AccessSdk(string host, int merchantId, string apiKey, string version = DEFAULT_VERSION, IWebClientFactory webClientFactory = null)
         {
             if (webClientFactory == null)
             {
-                this.webClientFactory = new SystemWebClientFactory();
+                this._webClientFactory = new SystemWebClientFactory();
             }
             else
             {
-                this.webClientFactory = webClientFactory;
+                this._webClientFactory = webClientFactory;
             }
 
             if (apiKey == null)
@@ -71,7 +71,7 @@ namespace KountAccessSdk.Service
             this._host = host ?? throw new AccessException(AccessErrorType.INVALID_DATA, "Missing host");
 
             ILoggerFactory factory = LogFactory.GetLoggerFactory();
-            this.logger = factory.GetLogger(typeof(AccessSdk).ToString());
+            this._logger = factory.GetLogger(typeof(AccessSdk).ToString());
 
 
             this._merchantId = merchantId;
@@ -84,16 +84,16 @@ namespace KountAccessSdk.Service
             var decisionEndpoint = host + "/api/decision";
 
 
-            this.logger.Info("Access SDK using merchantId = " + merchantId + ", host = " + host);
-            this.logger.Debug("velocity endpoint: " + velocityEndpoint);
-            this.logger.Debug("decision endpoint: " + decisionEndpoint);
-            this.logger.Debug("device endpoint: " + deviceEndpoint);
+            this._logger.Info("Access SDK using merchantId = " + merchantId + ", host = " + host);
+            this._logger.Debug("velocity endpoint: " + velocityEndpoint);
+            this._logger.Debug("decision endpoint: " + decisionEndpoint);
+            this._logger.Debug("device endpoint: " + deviceEndpoint);
         }
 
         /// <summary>
         /// Gets the Decision data for the session's username and password.
         /// </summary>
-        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="sessionId">The Session ID returned from the JavaScript data collector.</param>
         /// <param name="username">The username of the user.</param>
         /// <param name="password">The password of the user.</param>
         /// <returns>Decision data</returns>
@@ -104,7 +104,7 @@ namespace KountAccessSdk.Service
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
             }
 
-            using (IWebClient client = this.webClientFactory.Create())
+            using (IWebClient client = this._webClientFactory.Create())
             {
 
                 PrepareWebClient((WebClient)client);
@@ -130,7 +130,7 @@ namespace KountAccessSdk.Service
         /// <summary>
         /// Gets the Decision data async for the session's username and password.
         /// </summary>
-        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="sessionId">The Session ID returned from the JavaScript data collector.</param>
         /// <param name="username">The username of the user.</param>
         /// <param name="password">The password of the user.</param>
         /// <returns>Decision data</returns>
@@ -166,7 +166,7 @@ namespace KountAccessSdk.Service
         /// <summary>
         /// Gets the device data for the session.
         /// </summary>
-        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="sessionId">The Session ID returned from the JavaScript data collector.</param>
         /// <returns>Device data</returns>
         public DeviceInfo GetDevice(string sessionId)
         {
@@ -175,7 +175,7 @@ namespace KountAccessSdk.Service
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
             }
 
-            using (IWebClient client = this.webClientFactory.Create())
+            using (IWebClient client = this._webClientFactory.Create())
             {
                 PrepareWebClient((WebClient)client);
 
@@ -199,7 +199,7 @@ namespace KountAccessSdk.Service
         /// <summary>
         /// Gets the device data async for the session.
         /// </summary>
-        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="sessionId">The Session ID returned from the JavaScript data collector.</param>
         /// <returns>Device data</returns>
         public async Task<DeviceInfo> GetDeviceAsync(string sessionId)
         {
@@ -229,7 +229,7 @@ namespace KountAccessSdk.Service
         /// <summary>
         /// Gets the velocity data for the session's username and password.
         /// </summary>
-        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="sessionId">The Session ID returned from the JavaScript data collector.</param>
         /// <param name="username">The username of the user.</param>
         /// <param name="password">The password of the user.</param>
         /// <returns>Velocity data</returns>
@@ -240,9 +240,9 @@ namespace KountAccessSdk.Service
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
             }
 
-            using (IWebClient client = this.webClientFactory.Create())
+            using (IWebClient client = this._webClientFactory.Create())
             {
-                PrepareWebClient((WebClient)client);
+                PrepareWebClient((WebClient)client, true);
 
                 NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
 
@@ -266,7 +266,7 @@ namespace KountAccessSdk.Service
         /// <summary>
         /// Gets the velocity data async for the session's username and password.
         /// </summary>
-        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="sessionId">The Session ID returned from the JavaScript data collector.</param>
         /// <param name="username">The username of the user.</param>
         /// <param name="password">The password of the user.</param>
         /// <returns>Velocity data</returns>
@@ -280,7 +280,7 @@ namespace KountAccessSdk.Service
             using (WebClient client = new WebClient())
             {
 
-                PrepareWebClient(client);
+                PrepareWebClient(client, true);
 
                 NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
 
@@ -298,18 +298,100 @@ namespace KountAccessSdk.Service
             }
         }
 
-        private void PrepareWebClient(WebClient client)
+        /// <summary>
+        /// Get set of data elements for the session's username, password and uniq.
+        /// The set of data elements depends of "i" param.
+        /// </summary>
+        /// <param name="sessionId">The Session ID returned from the JavaScript data collector.</param>
+        /// <param name="username">The username of the user.</param>
+        /// <param name="password">Customer identifier.</param>
+        /// <param name="uniq">The password of the user.</param>
+        /// <param name="i">The requested set of data elements expected in response. Value should be between 1 and 31 inclusive.</param>
+        /// <returns>Set of data elements</returns>
+        public Info GetInfo(string sessionId, string username, string password, string uniq, int i)
         {
-            client.Headers["Authorization"] = "Basic " + this._encodedCredentials;
-            client.Headers["Content-Type"] = "text/json";
-            client.Headers["Accept"] = "text/json";
+            ValidateGetInfo(sessionId, username, password, uniq, i);
+
+            using (IWebClient client = this._webClientFactory.Create())
+            {
+                PrepareWebClient((WebClient)client, true);
+
+                NameValueCollection reqparm = GetRequestedParams(sessionId, username, password, uniq, i);
+
+                try
+                {
+                    byte[] responsebytes = client.UploadValues("/api/info", "POST", reqparm);
+                    string responsebody = Encoding.UTF8.GetString(responsebytes);
+                    Info info = JsonConvert.DeserializeObject<Info>(responsebody);
+
+                    return info;
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get set of data elements async for the session's username, password and uniq.
+        /// The set of data elements depends of "i" param.
+        /// </summary>
+        /// <param name="sessionId">The Session ID returned from the JavaScript data collector.</param>
+        /// <param name="username">The username of the user.</param>
+        /// <param name="password">Customer identifier.</param>
+        /// <param name="uniq">The password of the user.</param>
+        /// <param name="i">The requested set of data elements expected in response. Value should be between 1 and 31 inclusive.</param>
+        /// <returns>Set of data elements</returns>
+        public async Task<Info> GetInfoAsync(string sessionId, string username, string password, string uniq, int i)
+        {
+            ValidateGetInfo(sessionId, username, password, uniq, i);
+
+            using (WebClient client = new WebClient())
+            {
+                PrepareWebClient((WebClient)client, true);
+
+                NameValueCollection reqparm = GetRequestedParams(sessionId, username, password, uniq, i);
+
+                try
+                {
+                    byte[] responsebytes = await client.UploadValuesTaskAsync("/api/info", "POST", reqparm);
+                    string responsebody = Encoding.UTF8.GetString(responsebytes);
+                    Info info = JsonConvert.DeserializeObject<Info>(responsebody);
+
+                    return info;
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
+
+        private void PrepareWebClient(WebClient client, bool isPostWithUrlParams = false)
+        {
+            client.Headers.Add(HttpRequestHeader.Accept, "application/json");
+            client.Headers.Add(HttpRequestHeader.Authorization, "Basic " + this._encodedCredentials);
+
+            // WebClient throws WebException when UploadValues method is called and ContentType is different of "application/x-www-form-urlencoded".
+            // More info for WebClient UploadValues(string address, string method, NameValueCollection data) method here: https://msdn.microsoft.com/en-us/library/900ted1f%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396
+            if (isPostWithUrlParams)
+            {
+                client.Headers.Add(HttpRequestHeader.ContentType, "application/x-www-form-urlencoded");
+            }
+            else
+            {
+                client.Headers.Add(HttpRequestHeader.ContentType, "application/json");
+            }
 
             client.BaseAddress = this._host;
             client.Encoding = System.Text.Encoding.UTF8;
 
         }
 
-        private NameValueCollection GetRequestedParams(string sessionId, string username, string password)
+        private NameValueCollection GetRequestedParams(string sessionId, string username, string password, string uniq = null, int i = 0, string timing = null, string ts = null)
         {
             NameValueCollection reqparm = new NameValueCollection();
 
@@ -332,6 +414,26 @@ namespace KountAccessSdk.Service
             {
                 string ah = HashValue($"{username}:{password}");
                 reqparm.Add("ah", ah);
+            }
+
+            if (!String.IsNullOrEmpty(uniq))
+            {
+                reqparm.Add("uniq", uniq);
+            }
+
+            if (i > 0 && i <= 31)
+            {
+                reqparm.Add("i", i.ToString());
+            }
+
+            if (!String.IsNullOrEmpty(timing))
+            {
+                reqparm.Add("timing", timing);
+            }
+
+            if (!String.IsNullOrEmpty(ts))
+            {
+                reqparm.Add("ts", ts);
             }
 
             return reqparm;
@@ -375,41 +477,60 @@ namespace KountAccessSdk.Service
             }
             else
             {
-                string error = String.Empty;
-                string error_description = String.Empty;
+                string error;
+                string errorDescription;
 
                 using (HttpWebResponse resp = webException.Response as HttpWebResponse)
                 {
                     error = $"BAD RESPONSE({resp.StatusCode}):{resp.StatusDescription}";
-                    error_description = String.Empty;
+                    errorDescription = String.Empty;
                     switch (resp.StatusCode)
                     {
                         case HttpStatusCode.Unauthorized://401
-                            error_description = "UNAUTHORIZED. The credentials are not valid.";
+                            errorDescription = "UNAUTHORIZED. The credentials are not valid.";
                             break;
 
                         case HttpStatusCode.InternalServerError://500
-                            error_description = "UNKNOWN NETWORK ISSUE, try again later.";
+                            errorDescription = "UNKNOWN NETWORK ISSUE, try again later.";
                             break;
 
                         case HttpStatusCode.NotFound://404
-                            error_description = $"UNKNOWN HOST({resp.ResponseUri.Host}).";
+                            errorDescription = $"UNKNOWN HOST({resp.ResponseUri.Host}).";
                             break;
 
                         case HttpStatusCode.ServiceUnavailable://503
-                            error_description = "The service was not available.";
+                            errorDescription = "The service was not available.";
                             break;
 
                         case HttpStatusCode.GatewayTimeout://504 TODO
-                            error_description = "TIMEOUT request.";
+                            errorDescription = "TIMEOUT request.";
                             break;
 
                         default:
-                            error_description = "UNKNOWN NETWORK ISSUE.";
+                            errorDescription = "UNKNOWN NETWORK ISSUE.";
                             break;
                     }
                 }
-                throw new AccessException(AccessErrorType.NETWORK_ERROR, $"{error}. {error_description}");
+                throw new AccessException(AccessErrorType.NETWORK_ERROR, $"{error}. {errorDescription}");
+            }
+        }
+
+        private static void ValidateGetInfo(string sessionId, string username, string password, string uniq, int i)
+        {
+            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid session id (" + sessionId + ").  Must be 32 characters");
+            }
+
+            if (i >= 8 && string.IsNullOrEmpty(uniq))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"uniq\" is required.");
+            }
+
+            if ((i != 1 && i != 8 && i != 9 && i != 16 && i != 17 && i != 24 && i != 25) && 
+                (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameters \"username\" and \"password\" are both required.");
             }
         }
 
@@ -433,7 +554,5 @@ namespace KountAccessSdk.Service
             }
             return hex;
         }
-
-
     }
 }

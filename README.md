@@ -8,6 +8,7 @@ After your user submits their credentials for login (data collection is complete
 * information about the device
 * velocity details (the tallies of credential combinations used) about the user's login attempt(s)
 * an automated decision to approve the login, based on tolerances you set based on velocity
+* Kount Access data for session based on what was requested in the info flag
 
 Each response is returned in JSON format.
 This information enables you to make business decisions on how your site should to proceed with a user's login.
@@ -33,6 +34,7 @@ Ensure you have the information needed to instantiate the library in your app.
 Kount Access API Versions:
 
 * 0200
-* 0210 (default)
+* 0210
+* 0400 (default)
 
 For more information on using this library, consult the wiki section.
