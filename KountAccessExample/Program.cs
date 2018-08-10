@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------
 namespace KountAccessExample
 {
+    using KountAccessSdk.Enums;
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Newtonsoft.Json;
@@ -112,6 +113,51 @@ namespace KountAccessExample
                 Decision decision = decisionInfo.Decision;
                 // Let's look at the data
                 this.PrintDecisionInfo(decision);
+
+                // Get Kount Access data for session based on what was requested in the info flag
+                String uniq = "uniq(customer identifier)";
+                DataSetElements dataSet = new DataSetElements()
+                    .WithInfo()
+                    .WithVelocity()
+                    .WithDecision()
+                    .WithTrusted()
+                    .WithBehavioSec();
+
+                Info info = sdk.GetInfo(session, username, password, uniq, dataSet);
+                this.PrintDeviceInfo(info.Device);
+                this.PrintDecisionInfo(info.Decision);
+                this.PrintVelocityInfo(info.Velocity);
+                this.PrintFields(info.Trusted);
+                this.PrintFields(info.BehavioSec);
+
+                // Get devices that belong to a uniq user.
+                DevicesInfo devices = sdk.GetDevices(uniq);
+                foreach (var d in devices.Devices)
+                {
+                    this.PrintFields(d);
+                }
+
+                // Get the uniq users that belong to a device.
+                string deviceId = "DEVICE_ID";
+                var uniques = sdk.GetUniques(deviceId);
+                foreach (var u in uniques.Uniques)
+                {
+                    this.PrintFields(u);
+                }
+
+                // Update device trust referenced by session ID
+                sdk.SetDeviceTrustBySession(session, uniq, DeviceTrustState.Banned);
+
+                // Update device trust referenced by device ID
+                sdk.SetDeviceTrustByDevice(uniq, deviceId, DeviceTrustState.Trusted);
+
+                // Update behavior data.    
+                string timing = "timing data";
+                // BehavioHost and BehavioEnvironment can be set via AccessSdk constructor too.
+                sdk.BehavioHost = "https://api.behavio.kaptcha.com";
+                sdk.BehavioEnvironment = "sandbox";
+
+                sdk.SetBehavioSec(session, uniq, timing);
             }
             catch (AccessException ae)
             {

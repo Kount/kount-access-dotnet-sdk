@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Kount.Net.AccessSDK</id>
-    <version>1.0.0</version>
+    <version>4.0.0</version>
     <title>$title$</title>
     <authors>Kount Inc.</authors>
     <owners>Kount Inc.</owners>
@@ -18,4 +18,7 @@
       <dependency id="Newtonsoft.Json" version="10.0.3" />
     </dependencies>
   </metadata>
+  <files>
+    <file src="bin\Release\KountAccessSdk.dll" target="lib\net45" />
+  </files>
 </package>

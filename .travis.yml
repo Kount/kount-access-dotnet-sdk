@@ -1,0 +1,7 @@
+language: csharp
+solution: KountAccessSdk.sln
+install:
+  - nuget restore KountAccessSdk.sln
+script:
+  - xbuild /p:Configuration=Release KountAccessSdk.sln
+  - mono ./packages/NUnit.ConsoleRunner.3.8.0/tools/nunit3-console.exe ./KountAccessTest/bin/Release/KountAccessTest.dll

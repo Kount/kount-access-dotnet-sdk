@@ -262,3 +262,5 @@ __pycache__/
 
 # But include nuget.exe
 !nuget.exe
+!nuget4.7.0.exe
+!MSBuild.exe
