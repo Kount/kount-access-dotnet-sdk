@@ -51,12 +51,18 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccessSDKConstructorTests.cs" />
+    <Compile Include="AccessSDKTestBase.cs" />
     <Compile Include="DataSetElementsTest.cs" />
+    <Compile Include="GetDecisionTests.cs" />
+    <Compile Include="GetDeviceTests.cs" />
+    <Compile Include="GetInfoTests.cs" />
+    <Compile Include="GetVelocityTests.cs" />
+    <Compile Include="HashValueTests.cs" />
     <Compile Include="MockupWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AccessSDKTest .cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

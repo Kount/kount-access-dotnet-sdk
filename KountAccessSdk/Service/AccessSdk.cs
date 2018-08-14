@@ -306,10 +306,11 @@ namespace KountAccessSdk.Service
         /// <param name="username">The username of the user.</param>
         /// <param name="password">Customer identifier.</param>
         /// <param name="uniq">The password of the user.</param>
-        /// <param name="i">The requested set of data elements expected in response. Value should be between 1 and 31 inclusive.</param>
+        /// <param name="dse">The requested set of data elements expected in response.</param>
         /// <returns>Set of data elements</returns>
-        public Info GetInfo(string sessionId, string username, string password, string uniq, int i)
+        public Info GetInfo(string sessionId, string username, string password, string uniq, DataSetElements dse)
         {
+            int i = dse.Build();
             ValidateGetInfo(sessionId, username, password, uniq, i);
 
             using (IWebClient client = this._webClientFactory.Create())
@@ -342,10 +343,11 @@ namespace KountAccessSdk.Service
         /// <param name="username">The username of the user.</param>
         /// <param name="password">Customer identifier.</param>
         /// <param name="uniq">The password of the user.</param>
-        /// <param name="i">The requested set of data elements expected in response. Value should be between 1 and 31 inclusive.</param>
+        /// <param name="dse">The requested set of data elements expected in response.</param>
         /// <returns>Set of data elements</returns>
-        public async Task<Info> GetInfoAsync(string sessionId, string username, string password, string uniq, int i)
+        public async Task<Info> GetInfoAsync(string sessionId, string username, string password, string uniq, DataSetElements dse)
         {
+            int i = dse.Build();
             ValidateGetInfo(sessionId, username, password, uniq, i);
 
             using (WebClient client = new WebClient())
@@ -522,12 +524,19 @@ namespace KountAccessSdk.Service
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid session id (" + sessionId + ").  Must be 32 characters");
             }
 
-            if (i >= 8 && string.IsNullOrEmpty(uniq))
+            var trusted = new DataSetElements().WithTrusted().Build();
+            var behavioSec = new DataSetElements().WithBehavioSec().Build();
+            // uniq is required if trusted or behavio sec data is requested
+            if ((((i & trusted) == trusted || (i & behavioSec) == behavioSec)) && 
+                string.IsNullOrEmpty(uniq))
             {
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"uniq\" is required.");
             }
 
-            if ((i != 1 && i != 8 && i != 9 && i != 16 && i != 17 && i != 24 && i != 25) && 
+            var velocity = new DataSetElements().WithVelocity().Build();
+            var decision = new DataSetElements().WithDecision().Build();
+            // username and password are required if velocity or decision data is requested
+            if ((((i & velocity) == velocity || (i & decision) == decision)) &&
                 (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)))
             {
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Parameters \"username\" and \"password\" are both required.");

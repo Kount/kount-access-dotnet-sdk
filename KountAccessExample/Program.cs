@@ -115,13 +115,12 @@ namespace KountAccessExample
 
                 // Get Kount Access data for session based on what was requested in the info flag
                 String uniq = "uniq(customer identifier)";
-                int dataSet = new DataSetElements()
+                DataSetElements dataSet = new DataSetElements()
                     .WithInfo()
                     .WithVelocity()
                     .WithDecision()
                     .WithTrusted()
-                    .WithBehavioSec()
-                    .Build();
+                    .WithBehavioSec();
 
                 Info info = sdk.GetInfo(session, username, password, uniq, dataSet);
                 this.PrintDeviceInfo(info.Device);
