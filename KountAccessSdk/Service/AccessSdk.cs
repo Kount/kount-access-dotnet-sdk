@@ -24,7 +24,12 @@ namespace KountAccessSdk.Service
         /// </summary>
         private readonly ILogger _logger;
 
-        private const string DEFAULT_VERSION = "0400";
+        private const string DefaultVersion = "0400";
+        private const string VelocityEndpoint = "/api/velocity";
+        private const string DeviceEndpoint = "/api/device";
+        private const string DecisionEndpoint = "/api/decision";
+        private const string InfoEndpoint = "/api/info";
+        private const string DevicesEndpoint = "/api/getdevices";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -33,7 +38,7 @@ namespace KountAccessSdk.Service
 
         private readonly string _version;
         private readonly IWebClientFactory _webClientFactory;
-
+        
         /// <summary>
         /// Creates instance of the AccessSdk, allowing the client to specify version of responses to request.
         /// </summary>
@@ -42,7 +47,7 @@ namespace KountAccessSdk.Service
         /// <param name="apiKey">apiKey The API Key for the merchant.</param>
         /// <param name="version">version The version of the API response to return.</param>
         /// <param name="webClientFactory">Used for webClient mockup in tests.</param>
-        public AccessSdk(string host, int merchantId, string apiKey, string version = DEFAULT_VERSION, IWebClientFactory webClientFactory = null)
+        public AccessSdk(string host, int merchantId, string apiKey, string version = DefaultVersion, IWebClientFactory webClientFactory = null)
         {
             if (webClientFactory == null)
             {
@@ -79,15 +84,12 @@ namespace KountAccessSdk.Service
             this._version = version;
             this._encodedCredentials = GetBase64Credentials(merchantId.ToString(), apiKey);
 
-            var velocityEndpoint = host + "/api/velocity";
-            var deviceEndpoint = host + "/api/device";
-            var decisionEndpoint = host + "/api/decision";
-
-
-            this._logger.Info("Access SDK using merchantId = " + merchantId + ", host = " + host);
-            this._logger.Debug("velocity endpoint: " + velocityEndpoint);
-            this._logger.Debug("decision endpoint: " + decisionEndpoint);
-            this._logger.Debug("device endpoint: " + deviceEndpoint);
+            this._logger.Info("Access SDK using merchantId = " + merchantId + ", host = " + host + ", API key = " + apiKey);
+            this._logger.Debug("velocity endpoint: " + VelocityEndpoint);
+            this._logger.Debug("decision endpoint: " + DecisionEndpoint);
+            this._logger.Debug("device endpoint: " + DeviceEndpoint);
+            this._logger.Debug("info endpoint: " + InfoEndpoint);
+            this._logger.Debug("devices endpoint: " + DevicesEndpoint);
         }
 
         /// <summary>
@@ -107,13 +109,14 @@ namespace KountAccessSdk.Service
             using (IWebClient client = this._webClientFactory.Create())
             {
 
-                PrepareWebClient((WebClient)client);
+                PrepareWebClient((WebClient)client, true);
 
                 NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
+                this.LogRequest(DecisionEndpoint, username: username, password: password, session: sessionId);
 
                 try
                 {
-                    byte[] responsebytes = client.UploadValues("/api/decision", "POST", reqparm);
+                    byte[] responsebytes = client.UploadValues(DecisionEndpoint, "POST", reqparm);
                     string responsebody = Encoding.UTF8.GetString(responsebytes);
                     DecisionInfo dInfo = JsonConvert.DeserializeObject<DecisionInfo>(responsebody);
 
@@ -143,13 +146,14 @@ namespace KountAccessSdk.Service
 
             using (WebClient client = new WebClient())
             {
-                PrepareWebClient(client);
+                PrepareWebClient(client, true);
 
                 NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
+                this.LogRequest(DecisionEndpoint, username: username, password: password, session: sessionId);
 
                 try
                 {
-                    byte[] responsebytes = await client.UploadValuesTaskAsync("/api/decision", "POST", reqparm);
+                    byte[] responsebytes = await client.UploadValuesTaskAsync(DecisionEndpoint, "POST", reqparm);
                     string responsebody = Encoding.UTF8.GetString(responsebytes);
                     return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<DecisionInfo>(responsebody));
                 }
@@ -178,10 +182,11 @@ namespace KountAccessSdk.Service
             using (IWebClient client = this._webClientFactory.Create())
             {
                 PrepareWebClient((WebClient)client);
+                this.LogRequest(DeviceEndpoint, session: sessionId);
 
                 try
                 {
-                    var endPoint = $"/api/device?s={sessionId}&v={this._version}";
+                    var endPoint = $"{DeviceEndpoint}?s={sessionId}&v={this._version}";
                     string res = client.DownloadString(endPoint);
                     DeviceInfo dInfo = JsonConvert.DeserializeObject<DeviceInfo>(res);
 
@@ -211,10 +216,11 @@ namespace KountAccessSdk.Service
             using (WebClient client = new WebClient())
             {
                 PrepareWebClient(client);
+                this.LogRequest(DeviceEndpoint, session: sessionId);
 
                 try
                 {
-                    var endPoint = $"/api/device?s={sessionId}&v={this._version}";
+                    var endPoint = $"{DeviceEndpoint}?s={sessionId}&v={this._version}";
                     var res = await client.DownloadStringTaskAsync(endPoint);
                     return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<DeviceInfo>(res));
                 }
@@ -245,10 +251,11 @@ namespace KountAccessSdk.Service
                 PrepareWebClient((WebClient)client, true);
 
                 NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
+                this.LogRequest(VelocityEndpoint, username: username, password: password, session: sessionId);
 
                 try
                 {
-                    byte[] responsebytes = client.UploadValues("/api/velocity", "POST", reqparm);
+                    byte[] responsebytes = client.UploadValues(VelocityEndpoint, "POST", reqparm);
                     string responsebody = Encoding.UTF8.GetString(responsebytes);
                     VelocityInfo dInfo = JsonConvert.DeserializeObject<VelocityInfo>(responsebody);
 
@@ -283,10 +290,11 @@ namespace KountAccessSdk.Service
                 PrepareWebClient(client, true);
 
                 NameValueCollection reqparm = GetRequestedParams(sessionId, username, password);
+                this.LogRequest(VelocityEndpoint, username: username, password: password, session: sessionId);
 
                 try
                 {
-                    byte[] responsebytes = await client.UploadValuesTaskAsync("/api/velocity", "POST", reqparm);
+                    byte[] responsebytes = await client.UploadValuesTaskAsync(VelocityEndpoint, "POST", reqparm);
                     string responsebody = Encoding.UTF8.GetString(responsebytes);
                     return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<VelocityInfo>(responsebody));
                 }
@@ -318,10 +326,11 @@ namespace KountAccessSdk.Service
                 PrepareWebClient((WebClient)client, true);
 
                 NameValueCollection reqparm = GetRequestedParams(sessionId, username, password, uniq, i);
+                this.LogRequest(InfoEndpoint, username: username, password: password, session: sessionId, uniq: uniq, i: i);
 
                 try
                 {
-                    byte[] responsebytes = client.UploadValues("/api/info", "POST", reqparm);
+                    byte[] responsebytes = client.UploadValues(InfoEndpoint, "POST", reqparm);
                     string responsebody = Encoding.UTF8.GetString(responsebytes);
                     Info info = JsonConvert.DeserializeObject<Info>(responsebody);
 
@@ -355,12 +364,80 @@ namespace KountAccessSdk.Service
                 PrepareWebClient((WebClient)client, true);
 
                 NameValueCollection reqparm = GetRequestedParams(sessionId, username, password, uniq, i);
+                this.LogRequest(InfoEndpoint, username: username, password: password, session: sessionId, uniq: uniq, i: i);
 
                 try
                 {
-                    byte[] responsebytes = await client.UploadValuesTaskAsync("/api/info", "POST", reqparm);
+                    byte[] responsebytes = await client.UploadValuesTaskAsync(InfoEndpoint, "POST", reqparm);
                     string responsebody = Encoding.UTF8.GetString(responsebytes);
                     Info info = JsonConvert.DeserializeObject<Info>(responsebody);
+
+                    return info;
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get devices that belong to a uniq user.
+        /// </summary>
+        /// <param name="uniq">Unique user identifier.</param>
+        /// <returns>Devices data</returns>
+        public DevicesInfo GetDevices(string uniq)
+        {
+            if (string.IsNullOrEmpty(uniq))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"uniq\" is required.");
+            }
+
+            using (IWebClient client = this._webClientFactory.Create())
+            {
+
+                PrepareWebClient((WebClient)client);
+                this.LogRequest(DevicesEndpoint, uniq: uniq);
+
+                try
+                {
+                    var endPoint = $"{DevicesEndpoint}?v={this._version}&uniq={uniq}";
+                    string res = client.DownloadString(endPoint);
+                    DevicesInfo info = JsonConvert.DeserializeObject<DevicesInfo>(res);
+
+                    return info;
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get async devices that belong to a uniq user.
+        /// </summary>
+        /// <param name="uniq">Unique user identifier.</param>
+        /// <returns>Devices data</returns>
+        public async Task<DevicesInfo> GetDevicesAsync(string uniq)
+        {
+            if (string.IsNullOrEmpty(uniq))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"uniq\" is required.");
+            }
+
+            using (WebClient client = new WebClient())
+            {
+                PrepareWebClient(client);
+                this.LogRequest(DevicesEndpoint, uniq: uniq);
+
+                try
+                {
+                    var endPoint = $"{DevicesEndpoint}?v={this._version}&uniq={uniq}";
+                    string res = await client.DownloadStringTaskAsync(endPoint);
+                    DevicesInfo info = JsonConvert.DeserializeObject<DevicesInfo>(res);
 
                     return info;
                 }
@@ -521,7 +598,7 @@ namespace KountAccessSdk.Service
         {
             if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
             {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid session id (" + sessionId + ").  Must be 32 characters");
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
             }
 
             var trusted = new DataSetElements().WithTrusted().Build();
@@ -541,6 +618,48 @@ namespace KountAccessSdk.Service
             {
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Parameters \"username\" and \"password\" are both required.");
             }
+        }
+
+        private void LogRequest(string endpoint, string username = null, string password = null, string session = null, string uniq = null, int i = 0)
+        {
+            string delimiter = "; ";
+            StringBuilder msg = new StringBuilder();
+            msg.Append(endpoint);
+            msg.Append(delimiter);
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                msg.AppendFormat("username hash: {0}", HashValue(username));
+                msg.Append(delimiter);
+            }
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                msg.AppendFormat("password hash: {0}", HashValue(password));
+                msg.Append(delimiter);
+            }
+
+            if (!string.IsNullOrEmpty(session))
+            {
+                msg.AppendFormat("session: {0}", session);
+                msg.Append(delimiter);
+            }
+
+            if (!string.IsNullOrEmpty(uniq))
+            {
+                msg.AppendFormat("uniq: {0}", uniq);
+                msg.Append(delimiter);
+            }
+
+            if (i > 0)
+            {
+                msg.AppendFormat("info flag: {0}", i);
+                msg.Append(delimiter);
+            }
+
+            msg.AppendFormat("API version: {0}", this._version);
+
+            this._logger.Info(msg.ToString());
         }
 
         /// <summary>

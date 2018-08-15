@@ -37,7 +37,7 @@ namespace KountAccessTest
 
             this.logger.Debug(JsonConvert.SerializeObject(info));
 
-            // Asert
+            // Assert
             Assert.IsNotNull(info);
             Assert.AreEqual(info.ResponseId, infoResp.ResponseId);
 
@@ -60,7 +60,7 @@ namespace KountAccessTest
             // Act
             Info infoResp = sdk.GetInfo(emptySessionId, user, password, uniq, dataSets);
 
-            // Asert
+            // Assert
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace KountAccessTest
             // Act
             Info infoResp = sdk.GetInfo(session, user, password, emptyUniq, dataSets);
 
-            // Asert
+            // Assert
             Assert.IsNotNull(infoResp);
         }
 
@@ -124,7 +124,7 @@ namespace KountAccessTest
             // Act
             Info infoResp = sdk.GetInfo(session, user, password, emptyUniq, dataSets);
 
-            // Asert
+            // Assert
         }
 
         [TestMethod]
@@ -146,7 +146,7 @@ namespace KountAccessTest
             // Act
             Info infoResp = sdk.GetInfo(session, emptyUser, password, uniq, dataSets);
 
-            // Asert
+            // Assert
             Assert.IsNotNull(infoResp);
         }
 
@@ -187,7 +187,7 @@ namespace KountAccessTest
             // Act
             Info infoResp = sdk.GetInfo(session, emptyUser, password, uniq, dataSets);
 
-            // Asert
+            // Assert
         }
 
         [TestMethod]
@@ -209,7 +209,7 @@ namespace KountAccessTest
             // Act
             Info infoResp = sdk.GetInfo(session, user, emptyPassword, uniq, dataSets);
 
-            // Asert
+            // Assert
             Assert.IsNotNull(infoResp);
         }
 
@@ -250,7 +250,7 @@ namespace KountAccessTest
             // Act
             Info infoResp = sdk.GetInfo(session, user, emptyPassword, uniq, dataSets);
 
-            // Asert
+            // Assert
         }
         #endregion
 

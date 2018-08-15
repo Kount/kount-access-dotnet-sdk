@@ -4,10 +4,12 @@ kount-access-dotnet-sdk 4.0.0
 
 ### New features
 * default API version is changed from 2.1 to 4.0
-* added get Kount Access data for session based on what was requested in the info flag
+* get Kount Access data for session based on what was requested in the info flag
+* get devices that belong to a uniq user
 
 ### Improvements
 * updated examples
+* logging each requests
 * added more unit tests
 * changed Accept HTTP header value from text/json to application/json
 

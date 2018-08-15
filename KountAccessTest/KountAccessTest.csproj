@@ -55,6 +55,7 @@
     <Compile Include="AccessSDKTestBase.cs" />
     <Compile Include="DataSetElementsTest.cs" />
     <Compile Include="GetDecisionTests.cs" />
+    <Compile Include="GetDevicesTests.cs" />
     <Compile Include="GetDeviceTests.cs" />
     <Compile Include="GetInfoTests.cs" />
     <Compile Include="GetVelocityTests.cs" />
