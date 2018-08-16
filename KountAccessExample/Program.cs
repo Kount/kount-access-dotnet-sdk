@@ -128,6 +128,13 @@ namespace KountAccessExample
                 this.PrintVelocityInfo(info.Velocity);
                 this.PrintFields(info.Trusted);
                 this.PrintFields(info.BehavioSec);
+
+                // Get devices that belong to a uniq user.
+                DevicesInfo devices = sdk.GetDevices(uniq);
+                foreach (var d in devices.Devices)
+                {
+                    this.PrintFields(d);
+                }
             }
             catch (AccessException ae)
             {

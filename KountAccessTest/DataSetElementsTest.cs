@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="DataSetElementsTest.cs" company="Kount Inc">
-//     Copyright 2018 Kount Inc. All rights reserved.
+//     Copyright 2017 Kount Inc. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 namespace KountAccessTest
@@ -25,7 +25,7 @@ namespace KountAccessTest
             // Act
             var dataSetNumber = dataSetElements.Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(0, dataSetNumber);
         }
 
@@ -40,7 +40,7 @@ namespace KountAccessTest
                 .WithInfo()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(1, dataSetNumber);
         }
 
@@ -55,7 +55,7 @@ namespace KountAccessTest
                 .WithVelocity()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(2, dataSetNumber);
         }
 
@@ -70,7 +70,7 @@ namespace KountAccessTest
                 .WithDecision()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(4, dataSetNumber);
         }
 
@@ -85,7 +85,7 @@ namespace KountAccessTest
                 .WithTrusted()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(8, dataSetNumber);
         }
 
@@ -100,7 +100,7 @@ namespace KountAccessTest
                 .WithBehavioSec()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(16, dataSetNumber);
         }
 
@@ -120,7 +120,7 @@ namespace KountAccessTest
                 .WithVelocity()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(3, dataSetNumber);
         }
 
@@ -136,7 +136,7 @@ namespace KountAccessTest
                 .WithDecision()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(6, dataSetNumber);
         }
 
@@ -152,7 +152,7 @@ namespace KountAccessTest
                 .WithTrusted()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(12, dataSetNumber);
         }
 
@@ -168,7 +168,7 @@ namespace KountAccessTest
                 .WithBehavioSec()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(24, dataSetNumber);
         }
 
@@ -189,7 +189,7 @@ namespace KountAccessTest
                 .WithDecision()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(7, dataSetNumber);
         }
 
@@ -206,7 +206,7 @@ namespace KountAccessTest
                 .WithTrusted()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(14, dataSetNumber);
         }
 
@@ -223,7 +223,7 @@ namespace KountAccessTest
                 .WithBehavioSec()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(28, dataSetNumber);
         }
 
@@ -246,7 +246,7 @@ namespace KountAccessTest
                 .WithBehavioSec()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(31, dataSetNumber);
         }
 
@@ -283,7 +283,7 @@ namespace KountAccessTest
                 .WithBehavioSec()
                 .Build();
 
-            // Asert
+            // Assert
             Assert.AreEqual(31, dataSetNumber);
         }
 

@@ -1,18 +1,19 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="KountResponseInfo.cs" company="Kount Inc">
+// <copyright file="DevicesInfo.cs" company="Kount Inc">
 //     Copyright 2018 Kount Inc. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 namespace KountAccessSdk.Models
 {
     using Newtonsoft.Json;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// Class definition of KountResponseInfo
+    /// Class definition of DeviceInfo model
     /// </summary>
-    public class KountResponseInfo
+    public class DevicesInfo : KountResponseInfo
     {
-        [JsonProperty("response_id")]
-        public string ResponseId { get; set; }
+        [JsonProperty("devices")]
+        public List<DeviceBasicInfo> Devices { get; set; }
     }
 }

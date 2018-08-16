@@ -63,7 +63,9 @@
     <Compile Include="Models\Decision.cs" />
     <Compile Include="Models\DecisionInfo.cs" />
     <Compile Include="Models\Device.cs" />
+    <Compile Include="Models\DeviceBasicInfo.cs" />
     <Compile Include="Models\DeviceInfo.cs" />
+    <Compile Include="Models\DevicesInfo.cs" />
     <Compile Include="Models\Info.cs" />
     <Compile Include="Models\KountResponseInfo.cs" />
     <Compile Include="Models\Reply.cs" />

@@ -3,7 +3,6 @@
 //     Copyright 2017 Kount Inc. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-
 namespace KountAccessTest
 {
     using KountAccessSdk.Enums;
@@ -13,6 +12,7 @@ namespace KountAccessTest
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using System.Collections.Generic;
+    using System;
 
     /// <summary>
     /// Test class for AccessSDK
@@ -25,7 +25,7 @@ namespace KountAccessTest
         /// </summary>
         protected ILogger logger;
 
-        protected const string DEFAULT_VERSION = "0400"; 
+        protected const string DEFAULT_VERSION = "0400";
         // Setup data for comparisons.
         protected static int merchantId = 999999;
         
@@ -47,11 +47,13 @@ namespace KountAccessTest
         protected DecisionInfo decisionInfo;
         protected VelocityInfo velocityInfo;
         protected Info info;
+        protected DevicesInfo devicesInfo;
         
         protected string jsonDevInfo;
         protected string jsonVeloInfo;
         protected string jsonDeciInfo;
         protected string jsonInfo;
+        protected string jsonDevicesInfo;
 
         [TestInitialize]
         public void TestSdkInit()
@@ -112,6 +114,16 @@ namespace KountAccessTest
             };
 
             jsonInfo = JsonConvert.SerializeObject(info);
+
+            devicesInfo = new DevicesInfo();
+            devicesInfo.ResponseId = responseId;
+            devicesInfo.Devices = new List<DeviceBasicInfo>()
+            {
+                new DeviceBasicInfo() { DeviceId = "54569fcbd187483a8a1570a3c67d1113", FriendlyName = "Device A", TrustState = DeviceTrustState.Trusted, DateFirstSeen = DateTime.UtcNow.AddHours(-1) },
+                new DeviceBasicInfo() { DeviceId = "abcdef12345678910abcdef987654321", FriendlyName = "Device B", TrustState = DeviceTrustState.Banned, DateFirstSeen = DateTime.UtcNow.AddHours(-2) }
+            };
+
+            jsonDevicesInfo = JsonConvert.SerializeObject(devicesInfo);
         }
     }
 }
