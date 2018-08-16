@@ -27,6 +27,12 @@ namespace KountAccessSdk.Models
         [JsonProperty("proxy")]
         public int Proxy { get; set; }
 
+        /// <summary>
+        /// Available from version 0400
+        /// </summary>
+        [JsonProperty("tor")]
+        public bool? Tor { get; set; }
+
         [JsonProperty("country")]
         public string Country { get; set; }
 

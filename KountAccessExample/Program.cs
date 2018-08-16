@@ -112,6 +112,22 @@ namespace KountAccessExample
                 Decision decision = decisionInfo.Decision;
                 // Let's look at the data
                 this.PrintDecisionInfo(decision);
+
+                // Get Kount Access data for session based on what was requested in the info flag
+                String uniq = "uniq(customer identifier)";
+                DataSetElements dataSet = new DataSetElements()
+                    .WithInfo()
+                    .WithVelocity()
+                    .WithDecision()
+                    .WithTrusted()
+                    .WithBehavioSec();
+
+                Info info = sdk.GetInfo(session, username, password, uniq, dataSet);
+                this.PrintDeviceInfo(info.Device);
+                this.PrintDecisionInfo(info.Decision);
+                this.PrintVelocityInfo(info.Velocity);
+                this.PrintFields(info.Trusted);
+                this.PrintFields(info.BehavioSec);
             }
             catch (AccessException ae)
             {

@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\DeviceTrustState.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\ILoggerFactory.cs" />
     <Compile Include="Interfaces\IWebClient.cs" />
@@ -56,17 +58,23 @@
     <Compile Include="Log\Factory\NopLoggerFactory.cs" />
     <Compile Include="Log\Factory\SimpleLoggerFactory.cs" />
     <Compile Include="Models\AccessException.cs" />
+    <Compile Include="Models\BehavioSec.cs" />
+    <Compile Include="Models\DataSetElements.cs" />
     <Compile Include="Models\Decision.cs" />
     <Compile Include="Models\DecisionInfo.cs" />
     <Compile Include="Models\Device.cs" />
     <Compile Include="Models\DeviceInfo.cs" />
+    <Compile Include="Models\Info.cs" />
+    <Compile Include="Models\KountResponseInfo.cs" />
     <Compile Include="Models\Reply.cs" />
+    <Compile Include="Models\RuleEvent.cs" />
     <Compile Include="Models\RuleEvents.cs" />
     <Compile Include="Models\SubAccount.cs" />
     <Compile Include="Models\SubAddress.cs" />
     <Compile Include="Models\SubDevice.cs" />
     <Compile Include="Models\SubPassword.cs" />
     <Compile Include="Models\SubUser.cs" />
+    <Compile Include="Models\TrustState.cs" />
     <Compile Include="Models\Velocity.cs" />
     <Compile Include="Models\VelocityInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
