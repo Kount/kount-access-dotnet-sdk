@@ -77,6 +77,8 @@
     <Compile Include="Models\SubPassword.cs" />
     <Compile Include="Models\SubUser.cs" />
     <Compile Include="Models\TrustState.cs" />
+    <Compile Include="Models\Unique.cs" />
+    <Compile Include="Models\UniquesInfo.cs" />
     <Compile Include="Models\Velocity.cs" />
     <Compile Include="Models\VelocityInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

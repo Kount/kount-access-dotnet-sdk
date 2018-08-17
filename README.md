@@ -10,6 +10,7 @@ After your user submits their credentials for login (data collection is complete
 * an automated decision to approve the login, based on tolerances you set based on velocity
 * Kount Access data for session based on what was requested in the info flag
 * list of devices that belong to a uniq user
+* list of uniq users that belong to a device
 
 Each response is returned in JSON format.
 This information enables you to make business decisions on how your site should to proceed with a user's login.
