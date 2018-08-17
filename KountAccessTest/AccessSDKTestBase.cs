@@ -48,12 +48,14 @@ namespace KountAccessTest
         protected VelocityInfo velocityInfo;
         protected Info info;
         protected DevicesInfo devicesInfo;
-        
+        protected UniquesInfo uniquesInfo;
+
         protected string jsonDevInfo;
         protected string jsonVeloInfo;
         protected string jsonDeciInfo;
         protected string jsonInfo;
         protected string jsonDevicesInfo;
+        protected string jsonUniquesInfo;
 
         [TestInitialize]
         public void TestSdkInit()
@@ -124,6 +126,16 @@ namespace KountAccessTest
             };
 
             jsonDevicesInfo = JsonConvert.SerializeObject(devicesInfo);
+
+            uniquesInfo = new UniquesInfo();
+            uniquesInfo.ResponseId = responseId;
+            uniquesInfo.Uniques = new List<Unique>()
+            {
+                new Unique() { UniqueId = "55e9fbfda2ce489d83b4a99c84c6f3e1", DateLastSeen = DateTime.UtcNow.AddHours(-1), TrustState = DeviceTrustState.Trusted  },
+                new Unique() { UniqueId = "55e9fbfda2ce489d83b4a99c84c6f3e2", DateLastSeen = DateTime.UtcNow.AddHours(-2), TrustState = DeviceTrustState.Banned  }
+            };
+
+            jsonUniquesInfo = JsonConvert.SerializeObject(uniquesInfo);
         }
     }
 }

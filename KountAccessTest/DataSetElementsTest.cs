@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="DataSetElementsTest.cs" company="Kount Inc">
-//     Copyright 2017 Kount Inc. All rights reserved.
+//     Copyright 2018 Kount Inc. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 namespace KountAccessTest

@@ -135,6 +135,14 @@ namespace KountAccessExample
                 {
                     this.PrintFields(d);
                 }
+
+                // Get the uniq users that belong to a device.
+                string deviceId = "DEVICE_ID";
+                var uniques = sdk.GetUniques(deviceId);
+                foreach (var u in uniques.Uniques)
+                {
+                    this.PrintFields(u);
+                }
             }
             catch (AccessException ae)
             {

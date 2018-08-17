@@ -30,6 +30,7 @@ namespace KountAccessSdk.Service
         private const string DecisionEndpoint = "/api/decision";
         private const string InfoEndpoint = "/api/info";
         private const string DevicesEndpoint = "/api/getdevices";
+        private const string UniquesEndpoint = "/api/getuniques";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -90,6 +91,7 @@ namespace KountAccessSdk.Service
             this._logger.Debug("device endpoint: " + DeviceEndpoint);
             this._logger.Debug("info endpoint: " + InfoEndpoint);
             this._logger.Debug("devices endpoint: " + DevicesEndpoint);
+            this._logger.Debug("uniques endpoint: " + UniquesEndpoint);
         }
 
         /// <summary>
@@ -449,12 +451,78 @@ namespace KountAccessSdk.Service
             }
         }
 
+        /// <summary>
+        /// Get the uniq users that belong to a device.
+        /// </summary>
+        /// <param name="d">Device ID.</param>
+        /// <returns>List of uniqs</returns>
+        public UniquesInfo GetUniques(string d)
+        {
+            if (string.IsNullOrEmpty(d))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"d\" is required.");
+            }
+
+            using (IWebClient client = this._webClientFactory.Create())
+            {
+                PrepareWebClient((WebClient)client);
+                this.LogRequest(UniquesEndpoint, deviceId: d);
+
+                try
+                {
+                    var endPoint = $"{UniquesEndpoint}?v={this._version}&d={d}";
+                    string res = client.DownloadString(endPoint);
+                    UniquesInfo uniqInfo = JsonConvert.DeserializeObject<UniquesInfo>(res);
+
+                    return uniqInfo;
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get async the uniq users that belong to a device.
+        /// </summary>
+        /// <param name="d">Device ID.</param>
+        /// <returns>List of uniqs</returns>
+        public async Task<UniquesInfo> GetUniquesAsync(string d)
+        {
+            if (string.IsNullOrEmpty(d))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"d\" is required.");
+            }
+
+            using (WebClient client = new WebClient())
+            {
+                PrepareWebClient(client);
+                this.LogRequest(UniquesEndpoint, deviceId: d);
+
+                try
+                {
+                    var endPoint = $"{UniquesEndpoint}?v={this._version}&d={d}";
+                    string res = await client.DownloadStringTaskAsync(endPoint);
+                    UniquesInfo uniqInfo = JsonConvert.DeserializeObject<UniquesInfo>(res);
+
+                    return uniqInfo;
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+                return null;
+            }
+        }
+
         private void PrepareWebClient(WebClient client, bool isPostWithUrlParams = false)
         {
             client.Headers.Add(HttpRequestHeader.Accept, "application/json");
             client.Headers.Add(HttpRequestHeader.Authorization, "Basic " + this._encodedCredentials);
 
-            // WebClient throws WebException when UploadValues method is called and ContentType is different of "application/x-www-form-urlencoded".
+            // WebClient throws WebException when UploadValues method is called and ContentType is diffrent of "application/x-www-form-urlencoded".
             // More info for WebClient UploadValues(string address, string method, NameValueCollection data) method here: https://msdn.microsoft.com/en-us/library/900ted1f%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396
             if (isPostWithUrlParams)
             {
@@ -620,7 +688,7 @@ namespace KountAccessSdk.Service
             }
         }
 
-        private void LogRequest(string endpoint, string username = null, string password = null, string session = null, string uniq = null, int i = 0)
+        private void LogRequest(string endpoint, string username = null, string password = null, string session = null, string uniq = null, string deviceId = null, int i = 0)
         {
             string delimiter = "; ";
             StringBuilder msg = new StringBuilder();
@@ -648,6 +716,12 @@ namespace KountAccessSdk.Service
             if (!string.IsNullOrEmpty(uniq))
             {
                 msg.AppendFormat("uniq: {0}", uniq);
+                msg.Append(delimiter);
+            }
+
+            if (!string.IsNullOrEmpty(deviceId))
+            {
+                msg.AppendFormat("device ID: {0}", deviceId);
                 msg.Append(delimiter);
             }
 

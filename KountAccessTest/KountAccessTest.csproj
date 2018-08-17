@@ -58,6 +58,7 @@
     <Compile Include="GetDevicesTests.cs" />
     <Compile Include="GetDeviceTests.cs" />
     <Compile Include="GetInfoTests.cs" />
+    <Compile Include="GetUniquesTests.cs" />
     <Compile Include="GetVelocityTests.cs" />
     <Compile Include="HashValueTests.cs" />
     <Compile Include="MockupWebClient.cs">
