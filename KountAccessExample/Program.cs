@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------
 namespace KountAccessExample
 {
+    using KountAccessSdk.Enums;
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Newtonsoft.Json;
@@ -143,6 +144,9 @@ namespace KountAccessExample
                 {
                     this.PrintFields(u);
                 }
+
+                // Update device trust referenced by session ID
+                sdk.SetDeviceTrustBySession(session, uniq, DeviceTrustState.Banned);
             }
             catch (AccessException ae)
             {

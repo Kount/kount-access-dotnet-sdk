@@ -5,6 +5,8 @@
 //-----------------------------------------------------------------------
 namespace KountAccessSdk.Service
 {
+    using KountAccessSdk.Enums;
+    using KountAccessSdk.Helpers;
     using KountAccessSdk.Interfaces;
     using KountAccessSdk.Log.Factory;
     using KountAccessSdk.Models;
@@ -16,6 +18,7 @@ namespace KountAccessSdk.Service
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Runtime.Serialization;
 
     public class AccessSdk
     {
@@ -31,6 +34,7 @@ namespace KountAccessSdk.Service
         private const string InfoEndpoint = "/api/info";
         private const string DevicesEndpoint = "/api/getdevices";
         private const string UniquesEndpoint = "/api/getuniques";
+        private const string DeviceTrustBySessionEndpoint = "/api/devicetrustbysession";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -39,7 +43,7 @@ namespace KountAccessSdk.Service
 
         private readonly string _version;
         private readonly IWebClientFactory _webClientFactory;
-        
+
         /// <summary>
         /// Creates instance of the AccessSdk, allowing the client to specify version of responses to request.
         /// </summary>
@@ -92,6 +96,7 @@ namespace KountAccessSdk.Service
             this._logger.Debug("info endpoint: " + InfoEndpoint);
             this._logger.Debug("devices endpoint: " + DevicesEndpoint);
             this._logger.Debug("uniques endpoint: " + UniquesEndpoint);
+            this._logger.Debug("Device trust by session endpoint: " + DeviceTrustBySessionEndpoint);
         }
 
         /// <summary>
@@ -103,10 +108,7 @@ namespace KountAccessSdk.Service
         /// <returns>Decision data</returns>
         public DecisionInfo GetDecision(string sessionId, string username, string password)
         {
-            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
-            }
+            ValidateSession(sessionId);
 
             using (IWebClient client = this._webClientFactory.Create())
             {
@@ -141,10 +143,7 @@ namespace KountAccessSdk.Service
         /// <returns>Decision data</returns>
         public async Task<DecisionInfo> GetDecisionAsync(string sessionId, string username, string password)
         {
-            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
-            }
+            ValidateSession(sessionId);
 
             using (WebClient client = new WebClient())
             {
@@ -176,10 +175,7 @@ namespace KountAccessSdk.Service
         /// <returns>Device data</returns>
         public DeviceInfo GetDevice(string sessionId)
         {
-            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
-            }
+            ValidateSession(sessionId);
 
             using (IWebClient client = this._webClientFactory.Create())
             {
@@ -210,10 +206,7 @@ namespace KountAccessSdk.Service
         /// <returns>Device data</returns>
         public async Task<DeviceInfo> GetDeviceAsync(string sessionId)
         {
-            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
-            }
+            ValidateSession(sessionId);
 
             using (WebClient client = new WebClient())
             {
@@ -243,10 +236,7 @@ namespace KountAccessSdk.Service
         /// <returns>Velocity data</returns>
         public VelocityInfo GetVelocity(string sessionId, string username, string password)
         {
-            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
-            }
+            ValidateSession(sessionId);
 
             using (IWebClient client = this._webClientFactory.Create())
             {
@@ -281,10 +271,7 @@ namespace KountAccessSdk.Service
         /// <returns>Velocity data</returns>
         public async Task<VelocityInfo> GetVelocityAsync(string sessionId, string username, string password)
         {
-            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
-            }
+            ValidateSession(sessionId);
 
             using (WebClient client = new WebClient())
             {
@@ -391,10 +378,7 @@ namespace KountAccessSdk.Service
         /// <returns>Devices data</returns>
         public DevicesInfo GetDevices(string uniq)
         {
-            if (string.IsNullOrEmpty(uniq))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"uniq\" is required.");
-            }
+            ValidateUniq(uniq);
 
             using (IWebClient client = this._webClientFactory.Create())
             {
@@ -425,10 +409,7 @@ namespace KountAccessSdk.Service
         /// <returns>Devices data</returns>
         public async Task<DevicesInfo> GetDevicesAsync(string uniq)
         {
-            if (string.IsNullOrEmpty(uniq))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"uniq\" is required.");
-            }
+            ValidateUniq(uniq);
 
             using (WebClient client = new WebClient())
             {
@@ -517,12 +498,70 @@ namespace KountAccessSdk.Service
             }
         }
 
+        /// <summary>
+        /// Update device trust referenced by session ID.
+        /// </summary>
+        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="uniq">Unique user identifier.</param>
+        /// <param name="ts">Trust state.</param>
+        public void SetDeviceTrustBySession(string sessionId, string uniq, DeviceTrustState ts)
+        {
+            ValidateSession(sessionId);
+            ValidateUniq(uniq);
+
+            using (IWebClient client = this._webClientFactory.Create())
+            {
+                PrepareWebClient((WebClient)client, true);
+                this.LogRequest(DeviceTrustBySessionEndpoint, session: sessionId, ts: ts);
+
+                NameValueCollection reqparm = GetRequestedParams(sessionId, uniq: uniq, ts: ts.GetAttributeValue<EnumMemberAttribute, string>(x => x.Value));
+
+                try
+                {
+                    byte[] responsebytes = client.UploadValues(DeviceTrustBySessionEndpoint, "POST", reqparm);
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update device trust referenced by session ID.
+        /// </summary>
+        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>
+        /// <param name="uniq">Unique user identifier.</param>
+        /// <param name="ts">Trust state.</param>
+        public async Task SetDeviceTrustBySessionAsync(string sessionId, string uniq, DeviceTrustState ts)
+        {
+            ValidateSession(sessionId);
+            ValidateUniq(uniq);
+
+            using (WebClient client = new WebClient())
+            {
+                PrepareWebClient(client, true);
+                this.LogRequest(DeviceTrustBySessionEndpoint, session: sessionId, ts: ts);
+
+                NameValueCollection reqparm = GetRequestedParams(sessionId, uniq: uniq, ts: ts.GetAttributeValue<EnumMemberAttribute, string>(x => x.Value));
+
+                try
+                {
+                    byte[] responsebytes = await client.UploadValuesTaskAsync(DeviceTrustBySessionEndpoint, "POST", reqparm);
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+            }
+        }
+
         private void PrepareWebClient(WebClient client, bool isPostWithUrlParams = false)
         {
             client.Headers.Add(HttpRequestHeader.Accept, "application/json");
             client.Headers.Add(HttpRequestHeader.Authorization, "Basic " + this._encodedCredentials);
 
-            // WebClient throws WebException when UploadValues method is called and ContentType is diffrent of "application/x-www-form-urlencoded".
+            // WebClient throws WebException when UploadValues method is called and ContentType is different of "application/x-www-form-urlencoded".
             // More info for WebClient UploadValues(string address, string method, NameValueCollection data) method here: https://msdn.microsoft.com/en-us/library/900ted1f%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396
             if (isPostWithUrlParams)
             {
@@ -538,7 +577,7 @@ namespace KountAccessSdk.Service
 
         }
 
-        private NameValueCollection GetRequestedParams(string sessionId, string username, string password, string uniq = null, int i = 0, string timing = null, string ts = null)
+        private NameValueCollection GetRequestedParams(string sessionId, string username = null, string password = null, string uniq = null, int i = 0, string timing = null, string ts = null)
         {
             NameValueCollection reqparm = new NameValueCollection();
 
@@ -664,18 +703,14 @@ namespace KountAccessSdk.Service
 
         private static void ValidateGetInfo(string sessionId, string username, string password, string uniq, int i)
         {
-            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
-            }
+            ValidateSession(sessionId);
 
             var trusted = new DataSetElements().WithTrusted().Build();
             var behavioSec = new DataSetElements().WithBehavioSec().Build();
             // uniq is required if trusted or behavio sec data is requested
-            if ((((i & trusted) == trusted || (i & behavioSec) == behavioSec)) && 
-                string.IsNullOrEmpty(uniq))
+            if ((((i & trusted) == trusted || (i & behavioSec) == behavioSec)))
             {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"uniq\" is required.");
+                ValidateUniq(uniq);
             }
 
             var velocity = new DataSetElements().WithVelocity().Build();
@@ -688,7 +723,23 @@ namespace KountAccessSdk.Service
             }
         }
 
-        private void LogRequest(string endpoint, string username = null, string password = null, string session = null, string uniq = null, string deviceId = null, int i = 0)
+        private static void ValidateUniq(string uniq)
+        {
+            if (string.IsNullOrEmpty(uniq))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"uniq\" is required.");
+            }
+        }
+
+        private static void ValidateSession(string sessionId)
+        {
+            if (String.IsNullOrEmpty(sessionId) || (sessionId.Length > 32))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid sessionid (" + sessionId + ").  Must be 32 characters");
+            }
+        }
+
+        private void LogRequest(string endpoint, string username = null, string password = null, string session = null, string uniq = null, string deviceId = null, int i = 0, DeviceTrustState? ts = null)
         {
             string delimiter = "; ";
             StringBuilder msg = new StringBuilder();
@@ -728,6 +779,12 @@ namespace KountAccessSdk.Service
             if (i > 0)
             {
                 msg.AppendFormat("info flag: {0}", i);
+                msg.Append(delimiter);
+            }
+
+            if (ts != null)
+            {
+                msg.AppendFormat("Device trust state: {0}", ts.Value.GetAttributeValue<EnumMemberAttribute, string>(x => x.Value));
                 msg.Append(delimiter);
             }
 

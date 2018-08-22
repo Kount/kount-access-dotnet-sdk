@@ -7,6 +7,7 @@ kount-access-dotnet-sdk 4.0.0
 * get Kount Access data for session based on what was requested in the info flag
 * get devices that belong to a uniq user
 * get the uniq users that belong to a device
+* update device trust referenced by session ID 
 
 ### Improvements
 * updated examples
