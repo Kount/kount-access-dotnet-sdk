@@ -35,6 +35,7 @@ namespace KountAccessSdk.Service
         private const string DevicesEndpoint = "/api/getdevices";
         private const string UniquesEndpoint = "/api/getuniques";
         private const string DeviceTrustBySessionEndpoint = "/api/devicetrustbysession";
+        private const string DeviceTrustByDeviceEndpoint = "/api/devicetrustbydevice";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -97,6 +98,7 @@ namespace KountAccessSdk.Service
             this._logger.Debug("devices endpoint: " + DevicesEndpoint);
             this._logger.Debug("uniques endpoint: " + UniquesEndpoint);
             this._logger.Debug("Device trust by session endpoint: " + DeviceTrustBySessionEndpoint);
+            this._logger.Debug("Device trust by device endpoint: " + DeviceTrustByDeviceEndpoint);
         }
 
         /// <summary>
@@ -556,6 +558,64 @@ namespace KountAccessSdk.Service
             }
         }
 
+        /// <summary>
+        /// Update device trust referenced by device ID.
+        /// </summary>
+        /// <param name="uniq">Unique user identifier.</param>
+        /// <param name="d">Device ID.</param>
+        /// <param name="ts">Trust state.</param>
+        public void SetDeviceTrustByDevice(string uniq, string d, DeviceTrustState ts)
+        {
+            ValidateUniq(uniq);
+            ValidateDeviceId(d);
+
+            using (IWebClient client = this._webClientFactory.Create())
+            {
+                PrepareWebClient((WebClient)client, true);
+
+                NameValueCollection reqparm = GetRequestedParams(uniq: uniq, ts: ts.GetAttributeValue<EnumMemberAttribute, string>(x => x.Value), d: d);
+                this.LogRequest(DeviceTrustByDeviceEndpoint, uniq: uniq, deviceId: d, ts: ts);
+
+                try
+                {
+                    byte[] responsebytes = client.UploadValues(DeviceTrustByDeviceEndpoint, "POST", reqparm);
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update device trust referenced by device ID.
+        /// </summary>
+        /// <param name="uniq">Unique user identifier.</param>
+        /// <param name="d">Device ID.</param>
+        /// <param name="ts">Trust state.</param>
+        public async Task SetDeviceTrustByDeviceAsync(string uniq, string d, DeviceTrustState ts)
+        {
+            ValidateUniq(uniq);
+            ValidateDeviceId(d);
+
+            using (WebClient client = new WebClient())
+            {
+                PrepareWebClient(client, true);
+
+                NameValueCollection reqparm = GetRequestedParams(uniq: uniq, ts: ts.GetAttributeValue<EnumMemberAttribute, string>(x => x.Value), d: d);
+                this.LogRequest(DeviceTrustByDeviceEndpoint, uniq: uniq, deviceId: d, ts: ts);
+
+                try
+                {
+                    byte[] responsebytes = await client.UploadValuesTaskAsync(DeviceTrustByDeviceEndpoint, "POST", reqparm);
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+            }
+        }
+
         private void PrepareWebClient(WebClient client, bool isPostWithUrlParams = false)
         {
             client.Headers.Add(HttpRequestHeader.Accept, "application/json");
@@ -577,7 +637,7 @@ namespace KountAccessSdk.Service
 
         }
 
-        private NameValueCollection GetRequestedParams(string sessionId, string username = null, string password = null, string uniq = null, int i = 0, string timing = null, string ts = null)
+        private NameValueCollection GetRequestedParams(string sessionId = null, string username = null, string password = null, string uniq = null, int i = 0, string timing = null, string ts = null, string d = null)
         {
             NameValueCollection reqparm = new NameValueCollection();
 
@@ -620,6 +680,11 @@ namespace KountAccessSdk.Service
             if (!String.IsNullOrEmpty(ts))
             {
                 reqparm.Add("ts", ts);
+            }
+
+            if (!String.IsNullOrEmpty(d))
+            {
+                reqparm.Add("d", d);
             }
 
             return reqparm;
@@ -720,6 +785,14 @@ namespace KountAccessSdk.Service
                 (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)))
             {
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Parameters \"username\" and \"password\" are both required.");
+            }
+        }
+        
+        private static void ValidateDeviceId(string d)
+        {
+            if (string.IsNullOrEmpty(d))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"d\" is required.");
             }
         }
 

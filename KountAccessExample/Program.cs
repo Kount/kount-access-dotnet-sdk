@@ -147,6 +147,9 @@ namespace KountAccessExample
 
                 // Update device trust referenced by session ID
                 sdk.SetDeviceTrustBySession(session, uniq, DeviceTrustState.Banned);
+
+                // Update device trust referenced by device ID
+                sdk.SetDeviceTrustByDevice(uniq, deviceId, DeviceTrustState.Trusted);
             }
             catch (AccessException ae)
             {
