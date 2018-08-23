@@ -12,6 +12,7 @@ After your user submits their credentials for login (data collection is complete
 * list of devices that belong to a uniq user
 * list of uniq users that belong to a device
 * update device trust referenced by session ID 
+* update device trust referenced by device ID 
 
 Each response is returned in JSON format.
 This information enables you to make business decisions on how your site should to proceed with a user's login.

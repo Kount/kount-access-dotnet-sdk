@@ -1,9 +1,8 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="SetDeviceTrustBySessionTests.cs" company="Kount Inc">
+// <copyright file="SetDeviceTrustByDeviceTests.cs" company="Kount Inc">
 //     Copyright 2018 Kount Inc. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-
 namespace KountAccessTest
 {
     using KountAccessSdk.Enums;
@@ -12,43 +11,43 @@ namespace KountAccessTest
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
-    /// Test class for SetDeviceTrustBySessionTests
+    /// Test class for SetDeviceTrustByDeviceTests
     /// </summary>
     [TestClass]
-    public class SetDeviceTrustBySessionTests : AccessSDKTestBase
+    public class SetDeviceTrustByDeviceTests : AccessSDKTestBase
     {
         [TestMethod]
-        public void TestDeviceTrustBySession_ShouldNotThrowException()
+        public void TestDeviceTrustByDevice_ShouldNotThrowException()
         {
             // Arrange
             MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonUniquesInfo);
             AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
             // Act
-            sdk.SetDeviceTrustBySession(session, uniq, DeviceTrustState.Trusted);
+            sdk.SetDeviceTrustByDevice(uniq, "abcdef12345678910abcdef987654321", DeviceTrustState.Trusted);
 
             // Assert
         }
 
         [TestMethod]
         [ExpectedException(typeof(AccessException))]
-        public void TestDeviceTrustBySessionWithoutSessionId_ShouldThrowException()
+        public void TestDeviceTrustByDeviceWithoutDeviceId_ShouldThrowException()
         {
             // Arrange
             MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDevicesInfo);
             AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey, DEFAULT_VERSION, mockFactory);
 
-            var emptySession = "";
+            var emptyDeviceId = "";
 
             // Act
-            sdk.SetDeviceTrustBySession(emptySession, uniq, DeviceTrustState.Trusted);
+            sdk.SetDeviceTrustByDevice(uniq, emptyDeviceId, DeviceTrustState.Trusted);
 
             // Assert
         }
 
         [TestMethod]
         [ExpectedException(typeof(AccessException))]
-        public void TestDeviceTrustBySessionWithoutUniq_ShouldThrowException()
+        public void TestDeviceTrustByDeviceWithoutUniq_ShouldThrowException()
         {
             // Arrange
             MockupWebClientFactory mockFactory = new MockupWebClientFactory(this.jsonDevicesInfo);
@@ -57,7 +56,7 @@ namespace KountAccessTest
             var emptyUniq = "";
 
             // Act
-            sdk.SetDeviceTrustBySession(session, emptyUniq, DeviceTrustState.Trusted);
+            sdk.SetDeviceTrustByDevice(emptyUniq, "abcdef12345678910abcdef987654321", DeviceTrustState.Trusted);
 
             // Assert
         }
