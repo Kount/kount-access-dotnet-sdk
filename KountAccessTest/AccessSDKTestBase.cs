@@ -42,7 +42,7 @@ namespace KountAccessTest
         protected static string responseId = "bf10cd20cf61286669e87342d029e405";
         protected static string decision = "A";
         protected static string uniq = "55e9fbfda2ce489d83b4a99c84c6f3e1";
-        
+
         protected DeviceInfo deviceInfo;
         protected DecisionInfo decisionInfo;
         protected VelocityInfo velocityInfo;

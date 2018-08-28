@@ -11,6 +11,7 @@ namespace KountAccessSdk.Service
     using KountAccessSdk.Log.Factory;
     using KountAccessSdk.Models;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Specialized;
     using System.Net;
@@ -36,6 +37,7 @@ namespace KountAccessSdk.Service
         private const string UniquesEndpoint = "/api/getuniques";
         private const string DeviceTrustBySessionEndpoint = "/api/devicetrustbysession";
         private const string DeviceTrustByDeviceEndpoint = "/api/devicetrustbydevice";
+        private const string BehavioSecEndpoint = "/behavio/data";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -45,6 +47,29 @@ namespace KountAccessSdk.Service
         private readonly string _version;
         private readonly IWebClientFactory _webClientFactory;
 
+        public string BehavioHost { get; set; }
+
+        string _behavioEnvironment;
+        public string BehavioEnvironment
+        {
+            get { return _behavioEnvironment; }
+            set
+            {
+                var v = value;
+                if (!string.IsNullOrEmpty(value))
+                {
+                    v = v.TrimEnd('/');
+
+                    if (!v.StartsWith("/"))
+                    {
+                        v = "/" + v;
+                    }
+                }
+
+                _behavioEnvironment = v;
+            }
+        }
+
         /// <summary>
         /// Creates instance of the AccessSdk, allowing the client to specify version of responses to request.
         /// </summary>
@@ -53,7 +78,9 @@ namespace KountAccessSdk.Service
         /// <param name="apiKey">apiKey The API Key for the merchant.</param>
         /// <param name="version">version The version of the API response to return.</param>
         /// <param name="webClientFactory">Used for webClient mockup in tests.</param>
-        public AccessSdk(string host, int merchantId, string apiKey, string version = DefaultVersion, IWebClientFactory webClientFactory = null)
+        /// <param name="behavioHost">FQDN of the host that AccessSdk will use for BehavioSec requests.</param>
+        /// <param name="behavioEnvironment">Environment used for BehavioSec requests (e.g. sandbox).</param>
+        public AccessSdk(string host, int merchantId, string apiKey, string version = DefaultVersion, IWebClientFactory webClientFactory = null, string behavioHost = null, string behavioEnvironment = null)
         {
             if (webClientFactory == null)
             {
@@ -81,6 +108,9 @@ namespace KountAccessSdk.Service
 
             this._host = host ?? throw new AccessException(AccessErrorType.INVALID_DATA, "Missing host");
 
+            this.BehavioHost = behavioHost;
+            this.BehavioEnvironment = behavioEnvironment;
+
             ILoggerFactory factory = LogFactory.GetLoggerFactory();
             this._logger = factory.GetLogger(typeof(AccessSdk).ToString());
 
@@ -99,6 +129,8 @@ namespace KountAccessSdk.Service
             this._logger.Debug("uniques endpoint: " + UniquesEndpoint);
             this._logger.Debug("Device trust by session endpoint: " + DeviceTrustBySessionEndpoint);
             this._logger.Debug("Device trust by device endpoint: " + DeviceTrustByDeviceEndpoint);
+            this._logger.Debug("BehavioSec endpoint: " + BehavioSecEndpoint);
+            this._logger.Debug("BehavioSec environment: " + BehavioEnvironment);
         }
 
         /// <summary>
@@ -616,6 +648,78 @@ namespace KountAccessSdk.Service
             }
         }
 
+        /// <summary>                                                                                                
+        /// Update behavior data.                                                                                    
+        /// </summary>                                                                                               
+        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>              
+        /// <param name="uniq">Unique user identifier.</param>                                                       
+        /// <param name="timing">Timing data gathered from a BehavioSec collection.</param>                          
+        public void SetBehavioSec(string sessionId, string uniq, string timing)
+        {
+            ValidateSession(sessionId);
+            ValidateUniq(uniq);
+            ValidateTiming(timing);
+
+            using (IWebClient client = this._webClientFactory.Create())
+            {
+                PrepareWebClient((WebClient)client, true);
+                UpdateWebClientForBehavioSec((WebClient)client);
+
+                if (string.IsNullOrEmpty(this.BehavioEnvironment))
+                {
+                    throw new AccessException(AccessErrorType.INVALID_DATA, "Missing BehavioSec environment.");
+                }
+
+                NameValueCollection reqparm = GetRequestedParams(sessionId: sessionId, uniq: uniq, timing: timing, addVersion: false, addMerchentId: true);
+                this.LogRequest(BehavioEnvironment + BehavioSecEndpoint, session: sessionId, uniq: uniq, timing: timing);
+
+                try
+                {
+                    byte[] responsebytes = client.UploadValues(BehavioEnvironment + BehavioSecEndpoint, "POST", reqparm);
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+            }
+        }
+
+        /// <summary>                                                                                                        
+        /// Update behavior data.                                                                                            
+        /// </summary>                                                                                                       
+        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>                      
+        /// <param name="uniq">Unique user identifier.</param>                                                               
+        /// <param name="timing">Timing data gathered from a BehavioSec collection.</param>                                  
+        public async Task SetBehavioSecAsync(string sessionId, string uniq, string timing)
+        {
+            ValidateSession(sessionId);
+            ValidateUniq(uniq);
+            ValidateTiming(timing);
+
+            using (WebClient client = new WebClient())
+            {
+                PrepareWebClient(client, true);
+                UpdateWebClientForBehavioSec(client);
+
+                if (string.IsNullOrEmpty(this.BehavioEnvironment))
+                {
+                    throw new AccessException(AccessErrorType.INVALID_DATA, "Missing BehavioSec environment.");
+                }
+
+                NameValueCollection reqparm = GetRequestedParams(sessionId: sessionId, uniq: uniq, timing: timing, addVersion: false, addMerchentId: true);
+                this.LogRequest(BehavioEnvironment + BehavioSecEndpoint, session: sessionId, uniq: uniq, timing: timing);
+
+                try
+                {
+                    byte[] responsebytes = await client.UploadValuesTaskAsync(BehavioEnvironment + BehavioSecEndpoint, "POST", reqparm);
+                }
+                catch (WebException ex)
+                {
+                    HandleWebException(ex);
+                }
+            }
+        }
+
         private void PrepareWebClient(WebClient client, bool isPostWithUrlParams = false)
         {
             client.Headers.Add(HttpRequestHeader.Accept, "application/json");
@@ -634,15 +738,36 @@ namespace KountAccessSdk.Service
 
             client.BaseAddress = this._host;
             client.Encoding = System.Text.Encoding.UTF8;
-
         }
 
-        private NameValueCollection GetRequestedParams(string sessionId = null, string username = null, string password = null, string uniq = null, int i = 0, string timing = null, string ts = null, string d = null)
+        private void UpdateWebClientForBehavioSec(WebClient client)
+        {
+            if (string.IsNullOrEmpty(this.BehavioHost))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Missing BehavioSec host.");
+            }
+
+            client.BaseAddress = this.BehavioHost.TrimEnd('/');
+        }
+
+        private NameValueCollection GetRequestedParams(string sessionId = null, string username = null, string password = null, string uniq = null, int i = 0, string timing = null, string ts = null, string d = null, bool addMerchentId = false, bool addVersion = true)
         {
             NameValueCollection reqparm = new NameValueCollection();
+            
+            if (addVersion)
+            {
+                reqparm.Add("v", this._version);
+            }
 
-            reqparm.Add("s", sessionId);
-            reqparm.Add("v", this._version);
+            if (!String.IsNullOrEmpty(sessionId))
+            {
+                reqparm.Add("s", sessionId);
+            }
+
+            if (addMerchentId)
+            {
+                reqparm.Add("m", this._merchantId.ToString());
+            }
 
             if (!String.IsNullOrEmpty(username))
             {
@@ -812,7 +937,20 @@ namespace KountAccessSdk.Service
             }
         }
 
-        private void LogRequest(string endpoint, string username = null, string password = null, string session = null, string uniq = null, string deviceId = null, int i = 0, DeviceTrustState? ts = null)
+        private static void ValidateTiming(string timing)
+        {
+            if (string.IsNullOrEmpty(timing))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"timing\" is required.");
+            }
+
+            if (!IsValidJson(timing))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Parameter \"timing\" is not valid JSON. Value: " + timing);
+            }
+        }
+
+        private void LogRequest(string endpoint, string username = null, string password = null, string session = null, string uniq = null, string deviceId = null, string timing = null, int i = 0, DeviceTrustState? ts = null)
         {
             string delimiter = "; ";
             StringBuilder msg = new StringBuilder();
@@ -849,6 +987,12 @@ namespace KountAccessSdk.Service
                 msg.Append(delimiter);
             }
 
+            if (!string.IsNullOrEmpty(timing))
+            {
+                msg.AppendFormat("timing: {0}", timing);
+                msg.Append(delimiter);
+            }
+
             if (i > 0)
             {
                 msg.AppendFormat("info flag: {0}", i);
@@ -864,6 +1008,33 @@ namespace KountAccessSdk.Service
             msg.AppendFormat("API version: {0}", this._version);
 
             this._logger.Info(msg.ToString());
+        }
+
+        private static bool IsValidJson(string strInput)
+        {
+            strInput = strInput.Trim();
+            if ((strInput.StartsWith("{") && strInput.EndsWith("}")) || //For object
+                (strInput.StartsWith("[") && strInput.EndsWith("]"))) //For array
+            {
+                try
+                {
+                    var obj = JToken.Parse(strInput);
+                    return true;
+                }
+                catch (JsonReaderException jex)
+                {
+                    //Exception in parsing json
+                    return false;
+                }
+                catch (Exception ex) //some other exception
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
