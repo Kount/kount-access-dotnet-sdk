@@ -9,6 +9,7 @@ kount-access-dotnet-sdk 4.0.0
 * get the uniq users that belong to a device
 * update device trust referenced by session ID 
 * update device trust referenced by device ID 
+* update behavior data
 
 ### Improvements
 * updated examples

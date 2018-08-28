@@ -150,6 +150,14 @@ namespace KountAccessExample
 
                 // Update device trust referenced by device ID
                 sdk.SetDeviceTrustByDevice(uniq, deviceId, DeviceTrustState.Trusted);
+
+                // Update behavior data.    
+                string timing = "timing data";
+                // BehavioHost and BehavioEnvironment can be set via AccessSdk constructor too.
+                sdk.BehavioHost = "https://api.behavio.kaptcha.com";
+                sdk.BehavioEnvironment = "sandbox";
+
+                sdk.SetBehavioSec(session, uniq, timing);
             }
             catch (AccessException ae)
             {
