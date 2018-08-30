@@ -8,15 +8,15 @@ namespace KountAccessTest
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Newtonsoft.Json;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
+    using NUnit.Framework.Constraints;
 
     /// <summary>
     /// Test class for GetUniquesTests
     /// </summary>
-    [TestClass]
     public class GetUniquesTests : AccessSDKTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestGetUniques()
         {
             // Arrange
@@ -35,8 +35,7 @@ namespace KountAccessTest
             Assert.AreEqual(this.uniquesInfo.Uniques.Count, uniquesResp.Uniques.Count);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AccessException))]
+        [Test]
         public void TestGetUniquesWithoutDeviceId_ShouldThrowException()
         {
             // Arrange
@@ -46,9 +45,10 @@ namespace KountAccessTest
             var emptyDeviceId = "";
 
             // Act
-            UniquesInfo infoResp = sdk.GetUniques(emptyDeviceId);
+            ActualValueDelegate<object> testDelegate = () => sdk.GetUniques(emptyDeviceId);
 
             // Assert
+            Assert.That(testDelegate, Throws.TypeOf<AccessException>());
         }
     }
 }

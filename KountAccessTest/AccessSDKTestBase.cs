@@ -9,15 +9,15 @@ namespace KountAccessTest
     using KountAccessSdk.Interfaces;
     using KountAccessSdk.Log.Factory;
     using KountAccessSdk.Models;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using System.Collections.Generic;
     using System;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for AccessSDK
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class AccessSDKTestBase
     {
         /// <summary>
@@ -57,7 +57,7 @@ namespace KountAccessTest
         protected string jsonDevicesInfo;
         protected string jsonUniquesInfo;
 
-        [TestInitialize]
+        [SetUp]
         public void TestSdkInit()
         {
             ILoggerFactory factory = LogFactory.GetLoggerFactory();

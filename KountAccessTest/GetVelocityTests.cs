@@ -8,15 +8,14 @@ namespace KountAccessTest
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Newtonsoft.Json;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for GetVelocityTests
     /// </summary>
-    [TestClass]
     public class GetVelocityTests : AccessSDKTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestGetVelocity()
         {
             try
@@ -44,7 +43,7 @@ namespace KountAccessTest
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetVelocityWebExceptionWithResponse()
         {
             try

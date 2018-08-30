@@ -8,15 +8,14 @@ namespace KountAccessTest
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Newtonsoft.Json;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for GetDecisionTests
     /// </summary>
-    [TestClass]
     public class GetDecisionTests : AccessSDKTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestGetDecision()
         {
             try
@@ -39,10 +38,8 @@ namespace KountAccessTest
             }
             catch (AccessException ae)
             {
-
                 Assert.Fail($"Bad exception {ae.ErrorType}:{ae.Message}");
             }
-
         }
     }
 }

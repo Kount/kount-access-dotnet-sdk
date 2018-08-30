@@ -3,21 +3,19 @@
 //     Copyright 2018 Kount Inc. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-
 namespace KountAccessTest
 {
     using KountAccessSdk.Enums;
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for SetDeviceTrustBySessionTests
     /// </summary>
-    [TestClass]
     public class SetDeviceTrustBySessionTests : AccessSDKTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestDeviceTrustBySession_ShouldNotThrowException()
         {
             // Arrange
@@ -30,8 +28,7 @@ namespace KountAccessTest
             // Assert
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AccessException))]
+        [Test]
         public void TestDeviceTrustBySessionWithoutSessionId_ShouldThrowException()
         {
             // Arrange
@@ -41,13 +38,11 @@ namespace KountAccessTest
             var emptySession = "";
 
             // Act
-            sdk.SetDeviceTrustBySession(emptySession, uniq, DeviceTrustState.Trusted);
-
             // Assert
+            Assert.That(() => sdk.SetDeviceTrustBySession(emptySession, uniq, DeviceTrustState.Trusted), Throws.TypeOf<AccessException>());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AccessException))]
+        [Test]
         public void TestDeviceTrustBySessionWithoutUniq_ShouldThrowException()
         {
             // Arrange
@@ -57,9 +52,8 @@ namespace KountAccessTest
             var emptyUniq = "";
 
             // Act
-            sdk.SetDeviceTrustBySession(session, emptyUniq, DeviceTrustState.Trusted);
-
             // Assert
+            Assert.That(() => sdk.SetDeviceTrustBySession(session, emptyUniq, DeviceTrustState.Trusted), Throws.TypeOf<AccessException>());
         }
     }
 }
