@@ -20,7 +20,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{6A3EACF8-B418-4224-92D1-215C4AF22161}"
 	ProjectSection(SolutionItems) = preProject
 		builds\create_nuGet_package.bat = builds\create_nuGet_package.bat
+		builds\MSBuild.exe = builds\MSBuild.exe
 		builds\nuget.exe = builds\nuget.exe
+		builds\nuget4.7.0.exe = builds\nuget4.7.0.exe
 	EndProjectSection
 EndProject
 Global

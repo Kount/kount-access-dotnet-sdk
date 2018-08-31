@@ -106,7 +106,12 @@ namespace KountAccessSdk.Service
                 throw new AccessException(AccessErrorType.INVALID_DATA, "Invalid merchantId");
             }
 
-            this._host = host ?? throw new AccessException(AccessErrorType.INVALID_DATA, "Missing host");
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new AccessException(AccessErrorType.INVALID_DATA, "Missing host");
+            }
+
+            this._host = host;
 
             this.BehavioHost = behavioHost;
             this.BehavioEnvironment = behavioEnvironment;
@@ -1021,12 +1026,12 @@ namespace KountAccessSdk.Service
                     var obj = JToken.Parse(strInput);
                     return true;
                 }
-                catch (JsonReaderException jex)
+                catch (JsonReaderException)
                 {
                     //Exception in parsing json
                     return false;
                 }
-                catch (Exception ex) //some other exception
+                catch (Exception) //some other exception
                 {
                     return false;
                 }
