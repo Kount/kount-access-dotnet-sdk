@@ -6,15 +6,15 @@ namespace KountAccessTest
 {
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for HashValueTests
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class HashValueTests
     {
-        [TestMethod]
+        [Test]
         public void TestHashValue()
         {
             try

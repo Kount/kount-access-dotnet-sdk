@@ -8,15 +8,14 @@ namespace KountAccessTest
     using KountAccessSdk.Enums;
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for SetDeviceTrustByDeviceTests
     /// </summary>
-    [TestClass]
     public class SetDeviceTrustByDeviceTests : AccessSDKTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestDeviceTrustByDevice_ShouldNotThrowException()
         {
             // Arrange
@@ -29,8 +28,7 @@ namespace KountAccessTest
             // Assert
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AccessException))]
+        [Test]
         public void TestDeviceTrustByDeviceWithoutDeviceId_ShouldThrowException()
         {
             // Arrange
@@ -40,13 +38,11 @@ namespace KountAccessTest
             var emptyDeviceId = "";
 
             // Act
-            sdk.SetDeviceTrustByDevice(uniq, emptyDeviceId, DeviceTrustState.Trusted);
-
             // Assert
+            Assert.That(() => sdk.SetDeviceTrustByDevice(uniq, emptyDeviceId, DeviceTrustState.Trusted), Throws.TypeOf<AccessException>());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AccessException))]
+        [Test]
         public void TestDeviceTrustByDeviceWithoutUniq_ShouldThrowException()
         {
             // Arrange
@@ -56,9 +52,8 @@ namespace KountAccessTest
             var emptyUniq = "";
 
             // Act
-            sdk.SetDeviceTrustByDevice(emptyUniq, "abcdef12345678910abcdef987654321", DeviceTrustState.Trusted);
-
             // Assert
+            Assert.That(() => sdk.SetDeviceTrustByDevice(emptyUniq, "abcdef12345678910abcdef987654321", DeviceTrustState.Trusted), Throws.TypeOf<AccessException>());
         }
     }
 }

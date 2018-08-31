@@ -5,19 +5,17 @@
 //-----------------------------------------------------------------------
 namespace KountAccessTest
 {
-    using System;
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Newtonsoft.Json;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for GetDeviceTests
     /// </summary>
-    [TestClass]
     public class GetDeviceTests : AccessSDKTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestGetDevice()
         {
             try
@@ -47,7 +45,7 @@ namespace KountAccessTest
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetDeviceConnectionClosed()
         {
             try
@@ -63,10 +61,8 @@ namespace KountAccessTest
             }
             catch (AccessException ae)
             {
-                Console.WriteLine(ae.Message);
                 Assert.AreEqual(ae.ErrorType, AccessErrorType.NETWORK_ERROR);
             }
-
         }
     }
 }

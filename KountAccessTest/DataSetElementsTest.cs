@@ -6,17 +6,17 @@
 namespace KountAccessTest
 {
     using KountAccessSdk.Models;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for DataSetElements
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class DataSetElementsTest
     {
         #region Call Build with single "with" included
 
-        [TestMethod]
+        [Test]
         public void TestCallWithBuildOnly_DefaultValueIsZero()
         {
             // Arrange
@@ -29,7 +29,7 @@ namespace KountAccessTest
             Assert.AreEqual(0, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithDeviceInfo_ShouldReturnOne()
         {
             // Arrange
@@ -44,7 +44,7 @@ namespace KountAccessTest
             Assert.AreEqual(1, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithVelocity_ShouldReturnTwo()
         {
             // Arrange
@@ -59,7 +59,7 @@ namespace KountAccessTest
             Assert.AreEqual(2, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithDecision_ShouldReturnFour()
         {
             // Arrange
@@ -74,7 +74,7 @@ namespace KountAccessTest
             Assert.AreEqual(4, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithTrustedDeviceInfo_ShouldReturnEight()
         {
             // Arrange
@@ -89,7 +89,7 @@ namespace KountAccessTest
             Assert.AreEqual(8, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithBehavioSec_ShouldReturnSixteen()
         {
             // Arrange
@@ -108,7 +108,7 @@ namespace KountAccessTest
 
         #region Call Build with two "with" included
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithDeviceInfoAndVelocity_ShouldReturnThree()
         {
             // Arrange
@@ -124,7 +124,7 @@ namespace KountAccessTest
             Assert.AreEqual(3, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithVelocityAndDecision_ShouldReturnSix()
         {
             // Arrange
@@ -140,7 +140,7 @@ namespace KountAccessTest
             Assert.AreEqual(6, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithDecisionAndTrustedDeviceInfo_ShouldReturnTwelve()
         {
             // Arrange
@@ -156,7 +156,7 @@ namespace KountAccessTest
             Assert.AreEqual(12, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithTrustedDeviceInfoAndBehavioSec_ShouldReturnTwentyFour()
         {
             // Arrange
@@ -176,7 +176,7 @@ namespace KountAccessTest
 
         #region Call Build with three "with" included
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithDeviceInfo_Velocity_Decision_ShouldReturnSeven()
         {
             // Arrange
@@ -193,7 +193,7 @@ namespace KountAccessTest
             Assert.AreEqual(7, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithVelocity_Decision_TrustedDeviceInfo_ShouldReturnFourteen()
         {
             // Arrange
@@ -210,7 +210,7 @@ namespace KountAccessTest
             Assert.AreEqual(14, dataSetNumber);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWith_Decision_TrustedDeviceInfo_BehavioSec_ShouldReturnTwentyfour()
         {
             // Arrange
@@ -231,7 +231,7 @@ namespace KountAccessTest
 
         #region Call Build with all "with" included
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithAllDataSetsIncluded_ShouldReturnThirtyOne()
         {
             // Arrange
@@ -254,7 +254,7 @@ namespace KountAccessTest
 
         #region Call Build with all "with" included and duplications
 
-        [TestMethod]
+        [Test]
         public void TestCallBuildWithAllDataSetsIncludedAndDuplications_ShouldReturnThirtyOne()
         {
             // Arrange

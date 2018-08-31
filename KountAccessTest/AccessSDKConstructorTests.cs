@@ -7,15 +7,14 @@ namespace KountAccessTest
 {
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     /// <summary>
     /// Test class for GetVelocityTests
     /// </summary>
-    [TestClass]
     public class AccessSDKConstructorTests : AccessSDKTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestConstructorAccessSDKHappyPath()
         {
             // Create the SDK.  If any of these values are invalid, an
@@ -26,7 +25,6 @@ namespace KountAccessTest
                 AccessSdk sdk = new AccessSdk(accessUrl, merchantId, apiKey);
 
                 Assert.IsNotNull(sdk);
-
             }
             catch (AccessException ae)
             {
@@ -35,14 +33,13 @@ namespace KountAccessTest
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestConstructorAccessSDKMissingApiKey()
         {
             try
             {
                 AccessSdk sdk = new AccessSdk(host, merchantId, null);
                 Assert.Fail("Should have failed apiKey");
-
             }
             catch (AccessException ae)
             {
@@ -50,15 +47,13 @@ namespace KountAccessTest
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestConstructorAccessSDKMissingHost()
         {
             try
             {
-
                 AccessSdk sdk = new AccessSdk(null, merchantId, apiKey);
                 Assert.Fail("Should have failed host");
-
             }
             catch (AccessException ae)
             {
@@ -66,15 +61,13 @@ namespace KountAccessTest
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestConstructorAccessSDKBadMerchant()
         {
             try
             {
-
                 AccessSdk sdk = new AccessSdk(host, -1, apiKey);
                 Assert.Fail("Should have failed merchantId");
-
             }
             catch (AccessException ae)
             {
@@ -82,15 +75,13 @@ namespace KountAccessTest
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestConstructorAccessSDKBlankApiKey()
         {
             try
             {
-
                 AccessSdk sdk = new AccessSdk(host, merchantId, "    ");
                 Assert.Fail("Should have failed apiKey");
-
             }
             catch (AccessException ae)
             {

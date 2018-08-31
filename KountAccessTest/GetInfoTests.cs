@@ -5,21 +5,19 @@
 //-----------------------------------------------------------------------
 namespace KountAccessTest
 {
-    using System;
-    using System.Linq;
     using KountAccessSdk.Models;
     using KountAccessSdk.Service;
     using Newtonsoft.Json;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
+    using NUnit.Framework.Constraints;
 
     /// <summary>
     /// Test class for GetInfoTests
     /// </summary>
-    [TestClass]
     public class GetInfoTests : AccessSDKTestBase
     {
         #region Get Info Tests
-        [TestMethod]
+        [Test]
         public void TestGetInfo()
         {
             // Arrange
@@ -45,8 +43,7 @@ namespace KountAccessTest
             Assert.IsTrue(info.Velocity.Password.Equals(infoResp.Velocity.Password));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AccessException))]
+        [Test]
         public void TestGetInfoWithoutSession_ShouldThrowException()
         {
             // Arrange
@@ -58,19 +55,19 @@ namespace KountAccessTest
             var emptySessionId = "";
 
             // Act
-            Info infoResp = sdk.GetInfo(emptySessionId, user, password, uniq, dataSets);
+            ActualValueDelegate<object> testDelegate = () => sdk.GetInfo(emptySessionId, user, password, uniq, dataSets);
 
             // Assert
+            Assert.That(testDelegate, Throws.TypeOf<AccessException>());
         }
 
-        [TestMethod]
-        [DataRow(1)] // WithInfo
-        [DataRow(2)] // WithVelocity
-        [DataRow(3)] // WithInfo and WithVelocity
-        [DataRow(4)] // WithDecision
-        [DataRow(5)] // WithInfo and WithDecision
-        [DataRow(6)] // WithVelocity and WithDecision
-        [DataRow(7)] // WithInfo, WithVelocity and WithDecision
+        [TestCase(1)] // WithInfo
+        [TestCase(2)] // WithVelocity
+        [TestCase(3)] // WithInfo and WithVelocity
+        [TestCase(4)] // WithDecision
+        [TestCase(5)] // WithInfo and WithDecision
+        [TestCase(6)] // WithVelocity and WithDecision
+        [TestCase(7)] // WithInfo, WithVelocity and WithDecision
         public void TestGetInfoWithoutUniq_ShouldPassValidation(int dataSetNumber)
         {
             DataSetElements dataSets = GetDataSetElementsFromExpectedValueAfterBuild(dataSetNumber);
@@ -86,33 +83,31 @@ namespace KountAccessTest
             Assert.IsNotNull(infoResp);
         }
 
-        [TestMethod]
-        [DataRow(8)]
-        [DataRow(9)]
-        [DataRow(10)]
-        [DataRow(11)]
-        [DataRow(12)]
-        [DataRow(13)]
-        [DataRow(14)]
-        [DataRow(15)]
-        [DataRow(16)]
-        [DataRow(17)]
-        [DataRow(18)]
-        [DataRow(19)]
-        [DataRow(20)]
-        [DataRow(21)]
-        [DataRow(22)]
-        [DataRow(23)]
-        [DataRow(24)]
-        [DataRow(24)]
-        [DataRow(25)]
-        [DataRow(26)]
-        [DataRow(27)]
-        [DataRow(28)]
-        [DataRow(29)]
-        [DataRow(30)]
-        [DataRow(31)]
-        [ExpectedException(typeof(AccessException))]
+        [TestCase(8)]
+        [TestCase(9)]
+        [TestCase(10)]
+        [TestCase(11)]
+        [TestCase(12)]
+        [TestCase(13)]
+        [TestCase(14)]
+        [TestCase(15)]
+        [TestCase(16)]
+        [TestCase(17)]
+        [TestCase(18)]
+        [TestCase(19)]
+        [TestCase(20)]
+        [TestCase(21)]
+        [TestCase(22)]
+        [TestCase(23)]
+        [TestCase(24)]
+        [TestCase(24)]
+        [TestCase(25)]
+        [TestCase(26)]
+        [TestCase(27)]
+        [TestCase(28)]
+        [TestCase(29)]
+        [TestCase(30)]
+        [TestCase(31)]
         public void TestGetInfoWithoutUniq_ShouldThrowException(int dataSetNumber)
         {
             DataSetElements dataSets = GetDataSetElementsFromExpectedValueAfterBuild(dataSetNumber);
@@ -122,19 +117,19 @@ namespace KountAccessTest
             var emptyUniq = "";
 
             // Act
-            Info infoResp = sdk.GetInfo(session, user, password, emptyUniq, dataSets);
+            ActualValueDelegate<object> testDelegate = () => sdk.GetInfo(session, user, password, emptyUniq, dataSets);
 
             // Assert
+            Assert.That(testDelegate, Throws.TypeOf<AccessException>());
         }
 
-        [TestMethod]
-        [DataRow(1)] // WithInfo
-        [DataRow(8)] // WithTrusted
-        [DataRow(9)] // WithInfo and WithTrusted
-        [DataRow(16)] // WithBehavioSec
-        [DataRow(17)] // WithInfo and WithBehavioSec
-        [DataRow(24)] // WithTrusted and WithBehavioSec
-        [DataRow(25)] // WithInfo, WithTrusted and WithBehavioSec
+        [TestCase(1)] // WithInfo
+        [TestCase(8)] // WithTrusted
+        [TestCase(9)] // WithInfo and WithTrusted
+        [TestCase(16)] // WithBehavioSec
+        [TestCase(17)] // WithInfo and WithBehavioSec
+        [TestCase(24)] // WithTrusted and WithBehavioSec
+        [TestCase(25)] // WithInfo, WithTrusted and WithBehavioSec
         public void TestGetInfoWithoutUser_ShouldPassValidation(int dataSetNumber)
         {
             DataSetElements dataSets = GetDataSetElementsFromExpectedValueAfterBuild(dataSetNumber);
@@ -150,32 +145,30 @@ namespace KountAccessTest
             Assert.IsNotNull(infoResp);
         }
 
-        [TestMethod]
-        [DataRow(2)]
-        [DataRow(3)]
-        [DataRow(4)]
-        [DataRow(5)]
-        [DataRow(6)]
-        [DataRow(7)]
-        [DataRow(10)]
-        [DataRow(11)]
-        [DataRow(12)]
-        [DataRow(13)]
-        [DataRow(14)]
-        [DataRow(15)]
-        [DataRow(18)]
-        [DataRow(19)]
-        [DataRow(20)]
-        [DataRow(21)]
-        [DataRow(22)]
-        [DataRow(23)]
-        [DataRow(26)]
-        [DataRow(27)]
-        [DataRow(28)]
-        [DataRow(29)]
-        [DataRow(30)]
-        [DataRow(31)]
-        [ExpectedException(typeof(AccessException))]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(5)]
+        [TestCase(6)]
+        [TestCase(7)]
+        [TestCase(10)]
+        [TestCase(11)]
+        [TestCase(12)]
+        [TestCase(13)]
+        [TestCase(14)]
+        [TestCase(15)]
+        [TestCase(18)]
+        [TestCase(19)]
+        [TestCase(20)]
+        [TestCase(21)]
+        [TestCase(22)]
+        [TestCase(23)]
+        [TestCase(26)]
+        [TestCase(27)]
+        [TestCase(28)]
+        [TestCase(29)]
+        [TestCase(30)]
+        [TestCase(31)]
         public void TestGetInfoWithoutUser_ShouldThrowException(int dataSetNumber)
         {
             DataSetElements dataSets = GetDataSetElementsFromExpectedValueAfterBuild(dataSetNumber);
@@ -185,19 +178,19 @@ namespace KountAccessTest
             var emptyUser = "";
 
             // Act
-            Info infoResp = sdk.GetInfo(session, emptyUser, password, uniq, dataSets);
+            ActualValueDelegate<object> testDelegate = () => sdk.GetInfo(session, emptyUser, password, uniq, dataSets);
 
             // Assert
+            Assert.That(testDelegate, Throws.TypeOf<AccessException>());
         }
 
-        [TestMethod]
-        [DataRow(1)] // WithInfo
-        [DataRow(8)] // WithTrusted
-        [DataRow(9)] // WithInfo and WithTrusted
-        [DataRow(16)] // WithBehavioSec
-        [DataRow(17)] // WithInfo and WithBehavioSec
-        [DataRow(24)] // WithTrusted and WithBehavioSec
-        [DataRow(25)] // WithInfo, WithTrusted and WithBehavioSec
+        [TestCase(1)] // WithInfo
+        [TestCase(8)] // WithTrusted
+        [TestCase(9)] // WithInfo and WithTrusted
+        [TestCase(16)] // WithBehavioSec
+        [TestCase(17)] // WithInfo and WithBehavioSec
+        [TestCase(24)] // WithTrusted and WithBehavioSec
+        [TestCase(25)] // WithInfo, WithTrusted and WithBehavioSec
         public void TestGetInfoWithoutPassword_ShouldPassValidation(int dataSetNumber)
         {
             DataSetElements dataSets = GetDataSetElementsFromExpectedValueAfterBuild(dataSetNumber);
@@ -213,32 +206,30 @@ namespace KountAccessTest
             Assert.IsNotNull(infoResp);
         }
 
-        [TestMethod]
-        [DataRow(2)]
-        [DataRow(3)]
-        [DataRow(4)]
-        [DataRow(5)]
-        [DataRow(6)]
-        [DataRow(7)]
-        [DataRow(10)]
-        [DataRow(11)]
-        [DataRow(12)]
-        [DataRow(13)]
-        [DataRow(14)]
-        [DataRow(15)]
-        [DataRow(18)]
-        [DataRow(19)]
-        [DataRow(20)]
-        [DataRow(21)]
-        [DataRow(22)]
-        [DataRow(23)]
-        [DataRow(26)]
-        [DataRow(27)]
-        [DataRow(28)]
-        [DataRow(29)]
-        [DataRow(30)]
-        [DataRow(31)]
-        [ExpectedException(typeof(AccessException))]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(5)]
+        [TestCase(6)]
+        [TestCase(7)]
+        [TestCase(10)]
+        [TestCase(11)]
+        [TestCase(12)]
+        [TestCase(13)]
+        [TestCase(14)]
+        [TestCase(15)]
+        [TestCase(18)]
+        [TestCase(19)]
+        [TestCase(20)]
+        [TestCase(21)]
+        [TestCase(22)]
+        [TestCase(23)]
+        [TestCase(26)]
+        [TestCase(27)]
+        [TestCase(28)]
+        [TestCase(29)]
+        [TestCase(30)]
+        [TestCase(31)]
         public void TestGetInfoWithoutPassword_ShouldThrowException(int dataSetNumber)
         {
             DataSetElements dataSets = GetDataSetElementsFromExpectedValueAfterBuild(dataSetNumber);
@@ -248,9 +239,10 @@ namespace KountAccessTest
             var emptyPassword = "";
 
             // Act
-            Info infoResp = sdk.GetInfo(session, user, emptyPassword, uniq, dataSets);
+            ActualValueDelegate<object> testDelegate = () => sdk.GetInfo(session, user, emptyPassword, uniq, dataSets);
 
             // Assert
+            Assert.That(testDelegate, Throws.TypeOf<AccessException>());
         }
         #endregion
 
