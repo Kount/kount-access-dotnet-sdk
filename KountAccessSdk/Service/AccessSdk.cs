@@ -37,7 +37,6 @@ namespace KountAccessSdk.Service
         private const string UniquesEndpoint = "/api/getuniques";
         private const string DeviceTrustBySessionEndpoint = "/api/devicetrustbysession";
         private const string DeviceTrustByDeviceEndpoint = "/api/devicetrustbydevice";
-        private const string BehavioSecEndpoint = "/behavio/data";
 
         private readonly string _apiKey;
         private readonly string _encodedCredentials;
@@ -46,30 +45,7 @@ namespace KountAccessSdk.Service
 
         private readonly string _version;
         private readonly IWebClientFactory _webClientFactory;
-
-        public string BehavioHost { get; set; }
-
-        string _behavioEnvironment;
-        public string BehavioEnvironment
-        {
-            get { return _behavioEnvironment; }
-            set
-            {
-                var v = value;
-                if (!string.IsNullOrEmpty(value))
-                {
-                    v = v.TrimEnd('/');
-
-                    if (!v.StartsWith("/"))
-                    {
-                        v = "/" + v;
-                    }
-                }
-
-                _behavioEnvironment = v;
-            }
-        }
-
+        
         /// <summary>
         /// Creates instance of the AccessSdk, allowing the client to specify version of responses to request.
         /// </summary>
@@ -134,8 +110,6 @@ namespace KountAccessSdk.Service
             this._logger.Debug("uniques endpoint: " + UniquesEndpoint);
             this._logger.Debug("Device trust by session endpoint: " + DeviceTrustBySessionEndpoint);
             this._logger.Debug("Device trust by device endpoint: " + DeviceTrustByDeviceEndpoint);
-            this._logger.Debug("BehavioSec endpoint: " + BehavioSecEndpoint);
-            this._logger.Debug("BehavioSec environment: " + BehavioEnvironment);
         }
 
         /// <summary>
@@ -653,77 +627,6 @@ namespace KountAccessSdk.Service
             }
         }
 
-        /// <summary>                                                                                                
-        /// Update behavior data.                                                                                    
-        /// </summary>                                                                                               
-        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>              
-        /// <param name="uniq">Unique user identifier.</param>                                                       
-        /// <param name="timing">Timing data gathered from a BehavioSec collection.</param>                          
-        public void SetBehavioSec(string sessionId, string uniq, string timing)
-        {
-            ValidateSession(sessionId);
-            ValidateUniq(uniq);
-            ValidateTiming(timing);
-
-            using (IWebClient client = this._webClientFactory.Create())
-            {
-                PrepareWebClient((WebClient)client, true);
-                UpdateWebClientForBehavioSec((WebClient)client);
-
-                if (string.IsNullOrEmpty(this.BehavioEnvironment))
-                {
-                    throw new AccessException(AccessErrorType.INVALID_DATA, "Missing BehavioSec environment.");
-                }
-
-                NameValueCollection reqparm = GetRequestedParams(sessionId: sessionId, uniq: uniq, timing: timing, addVersion: false, addMerchentId: true);
-                this.LogRequest(BehavioEnvironment + BehavioSecEndpoint, session: sessionId, uniq: uniq, timing: timing);
-
-                try
-                {
-                    byte[] responsebytes = client.UploadValues(BehavioEnvironment + BehavioSecEndpoint, "POST", reqparm);
-                }
-                catch (WebException ex)
-                {
-                    HandleWebException(ex);
-                }
-            }
-        }
-
-        /// <summary>                                                                                                        
-        /// Update behavior data.                                                                                            
-        /// </summary>                                                                                                       
-        /// <param name="sessionId">The Session ID returned from the Javascript data collector.</param>                      
-        /// <param name="uniq">Unique user identifier.</param>                                                               
-        /// <param name="timing">Timing data gathered from a BehavioSec collection.</param>                                  
-        public async Task SetBehavioSecAsync(string sessionId, string uniq, string timing)
-        {
-            ValidateSession(sessionId);
-            ValidateUniq(uniq);
-            ValidateTiming(timing);
-
-            using (WebClient client = new WebClient())
-            {
-                PrepareWebClient(client, true);
-                UpdateWebClientForBehavioSec(client);
-
-                if (string.IsNullOrEmpty(this.BehavioEnvironment))
-                {
-                    throw new AccessException(AccessErrorType.INVALID_DATA, "Missing BehavioSec environment.");
-                }
-
-                NameValueCollection reqparm = GetRequestedParams(sessionId: sessionId, uniq: uniq, timing: timing, addVersion: false, addMerchentId: true);
-                this.LogRequest(BehavioEnvironment + BehavioSecEndpoint, session: sessionId, uniq: uniq, timing: timing);
-
-                try
-                {
-                    byte[] responsebytes = await client.UploadValuesTaskAsync(BehavioEnvironment + BehavioSecEndpoint, "POST", reqparm);
-                }
-                catch (WebException ex)
-                {
-                    HandleWebException(ex);
-                }
-            }
-        }
 
         private void PrepareWebClient(WebClient client, bool isPostWithUrlParams = false)
         {
@@ -743,16 +646,6 @@ namespace KountAccessSdk.Service
 
             client.BaseAddress = this._host;
             client.Encoding = System.Text.Encoding.UTF8;
-        }
-
-        private void UpdateWebClientForBehavioSec(WebClient client)
-        {
-            if (string.IsNullOrEmpty(this.BehavioHost))
-            {
-                throw new AccessException(AccessErrorType.INVALID_DATA, "Missing BehavioSec host.");
-            }
-
-            client.BaseAddress = this.BehavioHost.TrimEnd('/');
         }
 
         private NameValueCollection GetRequestedParams(string sessionId = null, string username = null, string password = null, string uniq = null, int i = 0, string timing = null, string ts = null, string d = null, bool addMerchentId = false, bool addVersion = true)
